@@ -1,0 +1,102 @@
+{% extends "base.html"%}
+<!-- ################################################################ -->
+
+{% block stylesheet_links%}
+	<!-- Custom fonts for this template-->
+	<link href="../../../static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+	<link
+		href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		rel="stylesheet">
+
+	<!-- Custom styles for this template-->
+	<link href="../../../static/css/sb-admin-2.min.css" rel="stylesheet">
+{% endblock%}
+{% block title %} {{ title }} {% endblock %}
+{% block script_links%}
+	<!-- Bootstrap core JavaScript-->
+	<script src="../../../static/vendor/jquery/jquery.min.js"></script>
+	<script src="../../../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Core plugin JavaScript-->
+	<script src="../../../static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+	<!-- Custom scripts for all pages-->
+	<script src="../../../static/js/sb-admin-2.min.js"></script>
+
+	<!-- Page level plugins -->
+	<script src="../../../static/vendor/chart.js/Chart.min.js"></script>
+
+	<!-- Page level custom scripts -->
+	<script src="../../../static/js/demo/chart-area-demo.js"></script>
+	<script src="../../../static/js/demo/chart-pie-demo.js"></script>
+{% endblock%}
+{% block undraw_profile_1%}../../../static/img/undraw_profile_1.svg{% endblock%}
+{% block undraw_profile%}../../../static/img/undraw_profile.svg{% endblock%}
+{% block content %}
+<!--
+	<div class="container">
+
+	<div class="content-section">
+		<div class="outer">
+			  <div class="middle">
+				<div class="inner">
+					  <div class="text-center">
+						{% with messages = get_flashed_messages() %}
+							{% if messages %}
+								{% for msg in messages %}
+									<p>{{ msg }}</p>
+								{% endfor %}
+							{% endif %}
+						{% endwith %}
+					</div>
+				  <h4 style="text-align:center;">All Flights for {{ current_user.first_name}} {{ current_user.last_name}}</h4>
+				{% if flights and processes %}
+					<hr class="intro-divider">
+					<div class="center">
+					{% for flight in flights%}
+						{% if flight.rampagent_id == current_user.id %}
+							<div class="col-xl-8 col-lg-7">
+								<div class="card shadow mb-4">
+									<div class="card-header py-3">
+										<h6 class="m-0 font-weight-bold text-primary">Flight Number: {{ flight.flight_number }}</h6>
+									</div>
+									<div class="card-body">
+										<div class="table-responsive">
+											<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+												<thead>
+													<tr>
+														<th>Process Name</th>
+														<th>Status</th>
+														<th>Start</th>
+														<th>End</th>
+													</tr>
+												</thead>
+												<tbody>
+													{% for process in processes%}
+														{% if process.flight_id == flight.id and process.rampagent_id == current_user.id%}
+														<tr>
+															<td>{{ process.process_name}}</td>
+															<td>{{ process.status}}</td>
+															<td>{{ process.start_time}}</td>
+															<td>{{ process.end_time}}</td>
+														</tr>
+														{% endif%}
+													{% endfor %}
+												</tbody>
+											</table>
+										</div>
+									</div>
+								</div>
+							</div>
+						{% endif %}
+					{% endfor%}
+					</div>
+				{% else %}
+				<div style="text-align: center">
+					<div style="text-align: center">
+						<h3> No Flight have been added. </h3>
+						<hr class="intro-divider">
+					</div>
+				</div>
+				{% endif %} -->
+{% endblock%}

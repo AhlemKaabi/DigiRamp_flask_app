@@ -1,0 +1,1053 @@
+{% extends "base.html"%}
+<!-- ################################################################ -->
+
+{% block stylesheet_links%}
+	<link href="../../static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+	<!-- Custom styles for this template-->
+	<link href="../../static/css/sb-admin-2.min.css" rel="stylesheet">
+{% endblock%}
+{% block title %}Flight Dashboard{% endblock %}
+{% block script_links%}
+	<!-- Bootstrap core JavaScript-->
+	<script src="../../static/vendor/jquery/jquery.min.js"></script>
+	<script src="../../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Core plugin JavaScript-->
+	<script src="../../static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+	<!-- Custom scripts for all pages-->
+	<script src="../../static/js/sb-admin-2.min.js"></script>
+
+	<!-- Page level plugins -->
+	<script src="../../static/vendor/chart.js/Chart.min.js"></script>
+
+	<!-- Page level custom scripts -->
+	<script src="../../static/js/demo/chart-area-demo.js"></script>
+	<script src="../../static/js/demo/chart-pie-demo.js"></script>
+{% endblock%}
+{% block undraw_profile_1%}../../static/img/undraw_profile_1.svg{% endblock%}
+{% block undraw_profile%}../../static/img/undraw_profile.svg{% endblock%}
+{% block content %}
+				<!-- Begin Page Content -->
+				<div class="container-fluid">
+					<!-- flashes-->
+					<div class="text-center">
+						{% with messages = get_flashed_messages() %}
+							{% if messages %}
+								{% for msg in messages %}
+									<p>{{ msg }}</p>
+								{% endfor %}
+							{% endif %}
+						{% endwith %}
+					</div>
+					<!-- Page Heading -->
+					<div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+						<div class="card-body">
+							<p>Flight Num<br>{{ flight_data["flight_number"] }}</p>
+						</div>
+						<div class="card-body">
+							<p>FROM/TO<br>{{ flight_data["departure"] }}/{{ flight_data["destination"]}}</p>
+						</div>
+						<div class="card-body">
+							<p>A. REG.<br>{{ flight_data["aircraft_registration"] }}</p>
+						</div>
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                    </div>
+					<!-- Content Row -->
+					<div class="row col-xl-12 mb-4 justify-content-lg-center">
+						<!-- Passenger Handing Card -->
+						<div class="col-xl-3 col-md-6 mb-4">
+							<div class="card border-left-success shadow h-100 py-2">
+								<div class="card-body">
+									<div class="row no-gutters align-items-center">
+										<div class="col mr-2">
+											<div class="text-xs font-weight-bold text-success text-uppercase mb-1">Passenger Handing</div>
+											<div class="h5 mb-0 font-weight-bold text-gray-800">120</div>
+										</div>
+										<div class="col-auto">
+											<i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Loadsheet Instruction Card -->
+						<div class="col-xl-3 col-md-6 mb-4">
+							<div class="card border-left-info shadow h-100 py-2">
+								<div class="card-body">
+									<div class="row no-gutters align-items-center">
+										<div class="col mr-2">
+											<div class="text-xs font-weight-bold text-info text-uppercase mb-1">Loadsheet Instruction</div>
+											<div class="row no-gutters align-items-center">
+												<div class="col-auto">
+													<div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+												</div>
+												<div class="col">
+													<div class="progress progress-sm mr-2">
+														<div class="progress-bar bg-info" role="progressbar"
+															style="width: 50%" aria-valuenow="50" aria-valuemin="0"
+															aria-valuemax="100"></div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-auto">
+											<i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						<!-- Bagage Handling Card -->
+						<div class="col-xl-3 col-md-6 mb-4">
+							<div class="card border-left-warning shadow h-100 py-2">
+								<div class="card-body">
+									<div class="row no-gutters align-items-center">
+										<div class="col mr-2">
+											<div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Bagage Handling</div>
+											<div class="row no-gutters align-items-center">
+												<div class="col-auto">
+													<div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">70%</div>
+												</div>
+												<div class="col">
+													<div class="progress progress-sm mr-2">
+														<div class="progress-bar bg-warning" role="progressbar"
+															style="width: 70%" aria-valuenow="50" aria-valuemin="0"
+															aria-valuemax="100"></div>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="col-auto">
+											<i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Content Row -->
+
+					<div class="row">
+						<!-- turnaround processes table-->
+						<div class="col-xl-8 col-lg-7">
+							<div class="card shadow mb-4">
+								<div class="card-header py-3">
+									<h6 class="m-0 font-weight-bold text-primary">Turnaround Processes</h6>
+								</div>
+								<div class="card-body">
+									<div class="table-responsive">
+										<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+											<thead>
+												<tr>
+													<th>Process Name</th>
+													<th>Ready</th>
+													<th>Start</th>
+													<th>End</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td id="Deplanement">Deplanement</td>
+													<td>
+
+														<button id="DeplanementStatus" type="button" class="btn btn-danger" onclick="DeplanementStatusSave()">No</button>
+														<script type="text/javascript">
+
+															function DeplanementStatusSave(){
+																let DeplanementStatus = document.getElementById("DeplanementStatus")
+
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.deplanement', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+																dataSend= JSON.stringify({
+																	"status": "ready",
+																});
+																DeplanementStatus.className = "btn btn-success"
+																DeplanementStatus.textContent = "Yes"
+																document.getElementById("DeplanementStatus").disabled = true;
+																document.getElementById("DeplanementStart").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="DeplanementStart" onclick="DeplanementStartSave()" disabled>Time</button>
+														<p id="DeplanementStartTime"></p>
+														<script type="text/javascript">
+															var DeplanementHiddenStart = false;
+															function DeplanementStartSave() {
+																DeplanementHiddenStart = !DeplanementHiddenStart;
+																if(DeplanementHiddenStart) {
+																	document.getElementById('DeplanementStart').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.deplanement', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const DeplanementStartTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"StartTime": DeplanementStartTime,
+																});
+																document.getElementById("DeplanementStartTime").innerHTML = DeplanementStartTime;
+																xml.send(dataSend);
+																document.getElementById("DeplanementEnd").disabled = false;
+
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="DeplanementEnd" onclick="DeplanementEndSave()" disabled>Time</button>
+														<p id="DeplanementEndTime"></p>
+														<script>
+															var DeplanementHiddenEnd = false;
+															function DeplanementEndSave() {
+																DeplanementHiddenEnd = !DeplanementHiddenEnd;
+																if(DeplanementHiddenEnd) {
+																	document.getElementById('DeplanementEnd').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.deplanement', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const DeplanementEndTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"EndTime": DeplanementEndTime,
+																});
+																document.getElementById("DeplanementEndTime").innerHTML = DeplanementEndTime;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td id="Unloading">Unloading</td>
+													<td>
+
+														<button id="UnloadingStatus" type="button" class="btn btn-danger" onclick="UnloadingStatusSave()">No</button>
+														<script type="text/javascript">
+
+															function UnloadingStatusSave(){
+																let UnloadingStatus = document.getElementById("UnloadingStatus")
+
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.unloading', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+																dataSend= JSON.stringify({
+																	"status": "ready",
+																});
+																UnloadingStatus.className = "btn btn-success"
+																UnloadingStatus.textContent = "Yes"
+																document.getElementById("UnloadingStatus").disabled = true;
+																document.getElementById("UnloadingStart").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="UnloadingStart" onclick="UnloadingStartSave()" disabled>Time</button>
+														<p id="UnloadingStartTime"></p>
+														<script type="text/javascript">
+															var UnloadingHiddenStart = false;
+															function UnloadingStartSave() {
+																UnloadingHiddenStart = !UnloadingHiddenStart;
+																if(UnloadingHiddenStart) {
+																	document.getElementById('UnloadingStart').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.unloading', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const UnloadingStartTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"StartTime": UnloadingStartTime,
+																});
+																document.getElementById("UnloadingStartTime").innerHTML = UnloadingStartTime;
+																xml.send(dataSend);
+																document.getElementById("UnloadingEnd").disabled = false;
+
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="UnloadingEnd" onclick="UnloadingEndSave()" disabled>Time</button>
+														<p id="UnloadingEndTime"></p>
+														<script>
+															var UnloadingHiddenEnd = false;
+															function UnloadingEndSave() {
+																UnloadingHiddenEnd = !UnloadingHiddenEnd;
+																if(UnloadingHiddenEnd) {
+																	document.getElementById('UnloadingEnd').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.unloading', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const UnloadingEndTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"EndTime": UnloadingEndTime,
+																});
+																document.getElementById("UnloadingEndTime").innerHTML = UnloadingEndTime;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td id="Refuling">Refuling</td>
+													<td>
+
+														<button id="RefulingStatus" type="button" class="btn btn-danger" onclick="RefulingStatusSave()">No</button>
+														<script type="text/javascript">
+
+															function RefulingStatusSave(){
+																let RefulingStatus = document.getElementById("RefulingStatus")
+
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.refuling', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+																dataSend= JSON.stringify({
+																	"status": "ready",
+																});
+																RefulingStatus.className = "btn btn-success"
+																RefulingStatus.textContent = "Yes"
+																document.getElementById("RefulingStatus").disabled = true;
+																document.getElementById("RefulingStart").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="RefulingStart" onclick="RefulingStartSave()" disabled>Time</button>
+														<p id="RefulingStartTime"></p>
+														<script type="text/javascript">
+															var RefulingHiddenStart = false;
+															function RefulingStartSave() {
+																RefulingHiddenStart = !RefulingHiddenStart;
+																if(RefulingHiddenStart) {
+																	document.getElementById('RefulingStart').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.refuling', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const RefulingStartTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"StartTime": RefulingStartTime,
+																});
+																document.getElementById("RefulingStartTime").innerHTML = RefulingStartTime;
+																document.getElementById("RefulingEnd").disabled = false;
+
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="RefulingEnd" onclick="RefulingEndSave()" disabled>Time</button>
+														<p id="RefulingEndTime"></p>
+														<script>
+															var RefulingHiddenEnd = false;
+															function RefulingEndSave() {
+																RefulingHiddenEnd = !RefulingHiddenEnd;
+																if(RefulingHiddenEnd) {
+																	document.getElementById('RefulingEnd').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.refuling', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const RefulingEndTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"EndTime": RefulingEndTime,
+																});
+																document.getElementById("RefulingEndTime").innerHTML = RefulingEndTime;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td id="Catering">Catering</td>
+													<td>
+
+														<button id="CateringStatus" type="button" class="btn btn-danger" onclick="CateringStatusSave()">No</button>
+														<script type="text/javascript">
+
+															function CateringStatusSave(){
+																let CateringStatus = document.getElementById("CateringStatus")
+
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.catering', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+																dataSend= JSON.stringify({
+																	"status": "ready"
+																});
+																CateringStatus.className = "btn btn-success"
+																CateringStatus.textContent = "Yes"
+																document.getElementById("CateringStatus").disabled = true;
+																document.getElementById("CateringStart").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="CateringStart" onclick="CateringStartSave()" disabled>Time</button>
+														<p id="CateringStartTime"></p>
+														<script type="text/javascript">
+															var CateringHiddenStart = false;
+															function CateringStartSave() {
+																CateringHiddenStart = !CateringHiddenStart;
+																if(CateringHiddenStart) {
+																	document.getElementById('CateringStart').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.catering', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const CateringStartTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"StartTime": CateringStartTime,
+																});
+																document.getElementById("CateringStartTime").innerHTML = CateringStartTime;
+																document.getElementById("CateringEnd").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="CateringEnd" onclick="CateringEndSave()" disabled>Time</button>
+														<p id="CateringEndTime"></p>
+														<script>
+															var CateringHiddenEnd = false;
+															function CateringEndSave() {
+																CateringHiddenEnd = !CateringHiddenEnd;
+																if(CateringHiddenEnd) {
+																	document.getElementById('CateringEnd').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.catering', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const CateringEndTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"EndTime": CateringEndTime,
+																});
+																document.getElementById("CateringEndTime").innerHTML = CateringEndTime;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td id="Cleaning">Cleaning</td>
+													<td>
+
+														<button id="CleaningStatus" type="button" class="btn btn-danger" onclick="CleaningStatusSave()">No</button>
+														<script type="text/javascript">
+
+															function CleaningStatusSave(){
+																let CleaningStatus = document.getElementById("CleaningStatus")
+
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.cleaning', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+																dataSend= JSON.stringify({
+																	"status": "ready"
+																});
+																CleaningStatus.className = "btn btn-success"
+																CleaningStatus.textContent = "Yes"
+																document.getElementById("CleaningStatus").disabled = true;
+																document.getElementById("CleaningStart").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="CleaningStart" onclick="CleaningStartSave()" disabled>Time</button>
+														<p id="CleaningStartTime"></p>
+														<script type="text/javascript">
+															var CleaningHiddenStart = false;
+															function CleaningStartSave() {
+																CleaningHiddenStart = !CleaningHiddenStart;
+																if(CleaningHiddenStart) {
+																	document.getElementById('CleaningStart').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.cleaning', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const CleaningStartTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"StartTime": CleaningStartTime,
+																});
+																document.getElementById("CleaningStartTime").innerHTML = CleaningStartTime;
+																document.getElementById("CleaningEnd").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="CleaningEnd" onclick="CleaningEndSave()" disabled>Time</button>
+														<p id="CleaningEndTime"></p>
+														<script>
+															var CleaningHiddenEnd = false;
+															function CleaningEndSave() {
+																CleaningHiddenEnd = !CleaningHiddenEnd;
+																if(CleaningHiddenEnd) {
+																	document.getElementById('CleaningEnd').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.cleaning', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const CleaningEndTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"EndTime": CleaningEndTime,
+																});
+																document.getElementById("CleaningEndTime").innerHTML = CleaningEndTime;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td id="Bording">Bording</td>
+													<td>
+
+														<button id="BordingStatus" type="button" class="btn btn-danger" onclick="BordingStatusSave()">No</button>
+														<script type="text/javascript">
+
+															function BordingStatusSave(){
+																let BordingStatus = document.getElementById("BordingStatus")
+
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.bording', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+																dataSend= JSON.stringify({
+																	"status": "ready"
+																});
+																BordingStatus.className = "btn btn-success"
+																BordingStatus.textContent = "Yes"
+																document.getElementById("BordingStatus").disabled = true;
+																document.getElementById("BordingStart").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="BordingStart" onclick="BordingStartSave()" disabled>Time</button>
+														<p id="BordingStartTime"></p>
+														<script type="text/javascript">
+															var BordingHiddenStart = false;
+															function BordingStartSave() {
+																BordingHiddenStart = !BordingHiddenStart;
+																if(BordingHiddenStart) {
+																	document.getElementById('BordingStart').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.bording', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const BordingStartTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"StartTime": BordingStartTime,
+																});
+																document.getElementById("BordingStartTime").innerHTML = BordingStartTime;
+																document.getElementById("BordingEnd").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="BordingEnd" onclick="BordingEndSave()" disabled>Time</button>
+														<p id="BordingEndTime"></p>
+														<script>
+															var BordingHiddenEnd = false;
+															function BordingEndSave() {
+																BordingHiddenEnd = !BordingHiddenEnd;
+																if(BordingHiddenEnd) {
+																	document.getElementById('BordingEnd').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.bording', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const BordingEndTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"EndTime": BordingEndTime,
+																});
+																document.getElementById("BordingEndTime").innerHTML = BordingEndTime;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td id="Loading">Loading</td>
+													<td>
+
+														<button id="LoadingStatus" type="button" class="btn btn-danger" onclick="LoadingStatusSave()">No</button>
+														<script type="text/javascript">
+
+															function LoadingStatusSave(){
+																let BordingStatus = document.getElementById("LoadingStatus")
+
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.loading', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+																dataSend= JSON.stringify({
+																	"status": "ready"
+																});
+																LoadingStatus.className = "btn btn-success"
+																LoadingStatus.textContent = "Yes"
+																document.getElementById("LoadingStatus").disabled = true;
+																document.getElementById("LoadingStart").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="LoadingStart" onclick="LoadingStartSave()" disabled>Time</button>
+														<p id="LoadingStartTime"></p>
+														<script type="text/javascript">
+															var LoadingHiddenStart = false;
+															function LoadingStartSave() {
+																LoadingHiddenStart = !LoadingHiddenStart;
+																if(LoadingHiddenStart) {
+																	document.getElementById('LoadingStart').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.loading', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const LoadingStartTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"StartTime": LoadingStartTime,
+																});
+																document.getElementById("LoadingStartTime").innerHTML = LoadingStartTime;
+																document.getElementById("LoadingEnd").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="LoadingEnd" onclick="LoadingStartTime()" disabled>Time</button>
+														<p id="LoadingEndTime"></p>
+														<script>
+															var LoadingHiddenEnd = false;
+															function LoadingStartTime() {
+																LoadingHiddenEnd = !LoadingHiddenEnd;
+																if(LoadingHiddenEnd) {
+																	document.getElementById('LoadingEnd').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.loading', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const LoadingEndTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"EndTime": LoadingEndTime,
+																});
+																document.getElementById("LoadingEndTime").innerHTML = LoadingEndTime;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td id="Pushback">Pushback</td>
+													<td>
+
+														<button id="PushbackStatus" type="button" class="btn btn-danger" onclick="PushbackStatusSave()">No</button>
+														<script type="text/javascript">
+
+															function PushbackStatusSave(){
+																let BordingStatus = document.getElementById("PushbackStatus")
+
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.pushback', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+																dataSend= JSON.stringify({
+																	"status": "ready"
+																});
+																PushbackStatus.className = "btn btn-success"
+																PushbackStatus.textContent = "Yes"
+																document.getElementById("PushbackStatus").disabled = true;
+																document.getElementById("PushbackStart").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="PushbackStart" onclick="PushbackStartSave()" disabled>Time</button>
+														<p id="PushbackStartTime"></p>
+														<script type="text/javascript">
+															var PushbackHiddenStart = false;
+															function PushbackStartSave() {
+																PushbackHiddenStart = !PushbackHiddenStart;
+																if(PushbackHiddenStart) {
+																	document.getElementById('PushbackStart').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.pushback', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																xml.onload = function(){
+																	var dataReply = JSON.parse(this.responseText);
+																};//endfunction
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const PushbackStartTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"StartTime": PushbackStartTime,
+																});
+																document.getElementById("PushbackStartTime").innerHTML = PushbackStartTime;
+																document.getElementById("PushbackEnd").disabled = false;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+													<td>
+														<button type="button" class="btn btn-secondary" id="PushbackEnd" onclick="PushbackStartTime()" disabled>Time</button>
+														<p id="PushbackEndTime"></p>
+														<script>
+															var PushbackHiddenEnd = false;
+															function PushbackStartTime() {
+																PushbackHiddenEnd = !PushbackHiddenEnd;
+																if(PushbackHiddenEnd) {
+																	document.getElementById('PushbackEnd').style.display = 'none';
+																}
+
+																var xml = new XMLHttpRequest();
+																xml.open("POST","{{url_for('dashboard.pushback', id=flight_data['id'])}}",true);
+																xml.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+																var dateTime = new Date();
+																let addZero = (num) => {
+																	return num < 10 ? `0${num}` : num
+																}
+																let hr = addZero(dateTime.getHours());
+																let min = addZero(dateTime.getMinutes());
+																let sc = addZero(dateTime.getSeconds());
+
+																const PushbackEndTime = `${hr}:${min}:${sc}`
+
+																dataSend= JSON.stringify({
+																	"EndTime": PushbackEndTime,
+																});
+																document.getElementById("PushbackEndTime").innerHTML = PushbackEndTime;
+																xml.send(dataSend);
+															}
+														</script>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- cargo handling table-->
+						<div class="col-xl-4 col-lg-5">
+							<div class="card shadow mb-4">
+								<div class="card-header py-3">
+									<h6 class="m-0 font-weight-bold text-primary">Cargo Handling</h6>
+								</div>
+								<div class="card-body">
+									<div class="table-responsive">
+										<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+											<thead>
+												<tr>
+													<th>Process Name</th>
+													<th>Ready</th>
+												</tr>
+											</thead>
+
+											<tbody>
+												<tr>
+													<td>Cargo to load</td>
+													<td>
+														<button id="status00" type="button" class="btn btn-danger">No</button>
+														<script>
+															let btnyes00 = document.getElementById("status00")
+															btnyes00.addEventListener('click', () => {btnyes00.className = "btn btn-success" , btnyes00.textContent = "Yes"})
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td>mail to load</td>
+													<td>
+														<button id="status11" type="button" class="btn btn-danger">No</button>
+														<script>
+															let btnyes11 = document.getElementById("status11")
+															btnyes11.addEventListener('click', () => {btnyes11.className = "btn btn-success" , btnyes11.textContent = "Yes"})
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td>Special load</td>
+													<td>
+														<button id="status22" type="button" class="btn btn-danger">No</button>
+														<script>
+															let btnyes22 = document.getElementById("status22")
+															btnyes22.addEventListener('click', () => {btnyes22.className = "btn btn-success" , btnyes22.textContent = "Yes"})
+														</script>
+													</td>
+												</tr>
+												<tr>
+													<td>DG to load</td>
+													<td>
+														<button id="status33" type="button" class="btn btn-danger">No</button>
+														<script>
+															let btnyes33 = document.getElementById("status33")
+															btnyes33.addEventListener('click', () => {btnyes33.className = "btn btn-success" , btnyes33.textContent = "Yes"})
+														</script>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Content Row -->
+					<div class="row">
+						<!-- Content Column -->
+						<div class="col-lg-6 mb-4">
+							<!-- Project Card Example -->
+							<!-- Color System -->
+						</div>
+						<div class="col-lg-6 mb-4">
+							<!-- Illustrations -->
+							<!-- Approach -->
+						</div>
+					</div>
+                </div>
+                <!-- /.container-fluid -->
+{% endblock %}
+<!-- ################################################################################"" -->
