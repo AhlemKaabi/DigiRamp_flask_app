@@ -35,12 +35,11 @@
 {% block content %}
 <!-- Begin Page Content -->
 <div class="container">
-
 	<div class="content-section">
 		<div class="outer">
-			  <div class="middle">
+			<div class="middle">
 				<div class="inner">
-					  <div class="text-center">
+					<div class="text-center">
 						{% with messages = get_flashed_messages() %}
 							{% if messages %}
 								{% for msg in messages %}
@@ -49,55 +48,60 @@
 							{% endif %}
 						{% endwith %}
 					</div>
-				  <h4 style="text-align:center;">All Flights for {{ current_user.first_name}} {{ current_user.last_name}}</h4>
-				{% if flights and processes %}
-					<hr class="intro-divider">
-					<div class="center">
-					{% for flight in flights%}
-						{% if flight.rampagent_id == current_user.id %}
-							<div class="col-xl-8 col-lg-7">
-								<div class="card shadow mb-4">
-									<div class="card-header py-3">
-										<h6 class="m-0 font-weight-bold text-primary">Flight Number: {{ flight.flight_number }}</h6>
-									</div>
-									<div class="card-body">
-										<div class="table-responsive">
-											<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-												<thead>
-													<tr>
-														<th>Process Name</th>
-														<th>Status</th>
-														<th>Start</th>
-														<th>End</th>
-													</tr>
-												</thead>
-												<tbody>
-													{% for process in processes%}
-														{% if process.flight_id == flight.id and process.rampagent_id == current_user.id%}
+						<h4 style="text-align:center;">All Flights for {{ current_user.first_name}} {{ current_user.last_name}}</h4>
+					{% if flights and processes %}
+						<hr class="intro-divider">
+						<div class="center">
+						{% for flight in flights%}
+							{% if flight.rampagent_id == current_user.id %}
+								<div class="col-xl-12 col-lg-7">
+									<div class="card shadow mb-4">
+										<div class="card-header py-3">
+											<h6 class="m-0 font-weight-bold text-primary">Flight Number: {{ flight.flight_number }}</h6>
+										</div>
+										<div class="card-body">
+											<div class="table-responsive">
+												<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+													<thead>
 														<tr>
-															<td>{{ process.process_name}}</td>
-															<td>{{ process.status}}</td>
-															<td>{{ process.start_time}}</td>
-															<td>{{ process.end_time}}</td>
+															<th>Process Name</th>
+															<th>Status</th>
+															<th>Start</th>
+															<th>End</th>
 														</tr>
-														{% endif%}
-													{% endfor %}
-												</tbody>
-											</table>
+													</thead>
+													<tbody>
+														{% for process in processes%}
+															{% if process.flight_id == flight.id and process.rampagent_id == current_user.id%}
+															<tr>
+																<td>{{ process.process_name}}</td>
+																<td>{{ process.status}}</td>
+																<td>{{ process.start_time}}</td>
+																<td>{{ process.end_time}}</td>
+															</tr>
+															{% endif%}
+														{% endfor %}
+													</tbody>
+												</table>
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-						{% endif %}
-					{% endfor%}
-					</div>
-				{% else %}
-				<div style="text-align: center">
+							{% endif %}
+						{% endfor%}
+						</div>
+					{% else %}
 					<div style="text-align: center">
-						<h3> No Flight have been added. </h3>
-						<hr class="intro-divider">
+						<div style="text-align: center">
+							<h3> No Flight have been added. </h3>
+							<hr class="intro-divider">
+						</div>
 					</div>
+					{% endif %}
 				</div>
-				{% endif %}
+			</div>
+		</div>
+	</div>
+</div>
  <!-- /.container-fluid -->
 {% endblock%}

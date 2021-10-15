@@ -9,6 +9,7 @@ from ..models import Flight, Process
 
 processes = ["Deplanement", "Unloading", "Refuling", "Catering", "Cleaning", "Bording", "Loading", "Pushback"]
 
+
 @dashboard.route('/flights', methods=['GET', 'POST'])
 # @login_required
 def list_flights():
@@ -119,12 +120,17 @@ def show_EDP_loadsheet():
 
 @dashboard.route('/list-all-flights', methods=['GET', 'POST'])
 def all_flights():
-    flights = Flight.query.all()
-    processes = Process.query.all()
+    """
+    list all flight tables!
+    """
+    q = request.args.get('q')
+    if q:
+        flights = Flight.query.filter(Flight.flight_number.contains(q))
+        processes = Process.query.all()
+    else:
+        flights = Flight.query.all()
+        processes = Process.query.all()
     return render_template('dashboard/tables/all_flights.html', flights=flights, processes=processes)
-
-
-
 
 #### Processes ####
 
