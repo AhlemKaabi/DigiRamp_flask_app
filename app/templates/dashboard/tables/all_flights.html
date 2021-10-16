@@ -11,7 +11,9 @@
 	<!-- Custom styles for this template-->
 	<link href="../../../static/css/sb-admin-2.min.css" rel="stylesheet">
 {% endblock%}
-{% block title %} {{ title }} {% endblock %}
+{% block favicon%}../../../static/assets/img/favicon.ico{% endblock%}
+
+{% block title %}Flights Turnarount{% endblock %}
 {% block script_links%}
 	<!-- Bootstrap core JavaScript-->
 	<script src="../../../static/vendor/jquery/jquery.min.js"></script>
@@ -32,6 +34,22 @@
 {% endblock%}
 {% block undraw_profile_1%}../../../static/img/undraw_profile_1.svg{% endblock%}
 {% block undraw_profile%}../../../static/img/undraw_profile.svg{% endblock%}
+
+{% block search %}
+<!-- Topbar Search -->
+<form method="GET"
+class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+<div class="input-group">
+	<input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+		aria-label="Search" aria-describedby="basic-addon2" name="q">
+	<div class="input-group-append">
+		<button id="SearchButton" class="btn btn-primary" type="submit">
+			<i class="fas fa-search fa-sm"></i>
+		</button>
+	</div>
+</div>
+</form>
+{% endblock %}
 {% block content %}
 <!-- Begin Page Content -->
 <div class="container">

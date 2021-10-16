@@ -16,7 +16,8 @@ def list_flights():
     """
     List all flights
     """
-    flights = Flight.query.all()
+    flights = Flight.query.filter_by(rampagent_id = current_user.id)
+
     return render_template('dashboard/flights/flights.html', flights=flights)
 
 
