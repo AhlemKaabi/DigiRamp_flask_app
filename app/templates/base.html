@@ -156,11 +156,20 @@
 
 				<!-- Nav Item - Tables -->
 				<li class="nav-item">
-					<a class="nav-link" href="{{ url_for('dashboard.all_flights') }}">
+					<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsetables"
+						aria-expanded="true" aria-controls="collapsetables">
 						<i class="fas fa-fw fa-table"></i>
-						<span>Tables</span></a>
+						<span>Tables</span>
+					</a>
+					<div id="collapsetables" class="collapse" aria-labelledby="headingtables"
+						data-parent="#accordionSidebar">
+						<div class="bg-white py-2 collapse-inner rounded">
+							<h6 class="collapse-header">Pick a Data Table</h6>
+							<a class="collapse-item" href="{{ url_for('dashboard.operated_flights') }}">Operated Flights Data</a>
+							<a class="collapse-item" href="{{ url_for('dashboard.iata_code') }}">Airports IATA Code</a>
+						</div>
+					</div>
 				</li>
-
 				<!-- Divider -->
 				<hr class="sidebar-divider d-none d-md-block">
 

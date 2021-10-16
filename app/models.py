@@ -95,10 +95,5 @@ class Process(db.Model):
     flight_id = db.Column(db.Integer, db.ForeignKey('flights.id'))
     rampagent_id = db.Column(db.Integer, db.ForeignKey('rampagents.id'))
 
-#     def __repr__(self):
-#         return '<Process: {}>'.format(self.process_name)
-# #######################
-# 	# backref allows us to create a new property on the RampAgent model
-# 	# such that we can use ' rampagent.flight ' or ' rampagent.process '
-# # 	# to get the flight or process assigned to that rampagent
-# # ######################
+    def __repr__(self):
+        return '<Process: {}>'.format(self.process_name)

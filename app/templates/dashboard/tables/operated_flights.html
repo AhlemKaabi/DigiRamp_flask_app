@@ -75,7 +75,7 @@ class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 
 								<div class="col-xl-12 col-lg-7">
 									<div class="card shadow mb-4">
 										<div class="card-header py-3">
-											<h6 class="m-0 font-weight-bold text-primary">Flight Number: {{ flight.flight_number }}</h6>
+											<a href="{{ url_for('dashboard.start_operation', id=flight.id) }}"><h6 class="m-0 font-weight-bold text-primary">Flight Number: {{ flight.flight_number }}</h6></a>
 										</div>
 										<div class="card-body">
 											<div class="table-responsive">
