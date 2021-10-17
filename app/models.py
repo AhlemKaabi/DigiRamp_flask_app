@@ -6,7 +6,6 @@
 # contact
 # processes_data
 
-import app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 # generate_password_hash, which allows us to hash passwords
@@ -97,3 +96,15 @@ class Process(db.Model):
 
     def __repr__(self):
         return '<Process: {}>'.format(self.process_name)
+
+class Contact(db.Model):
+    """
+    Create a contact table
+    """
+    __tablename__ = 'contacts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(60), index=True,)
+    last_name = db.Column(db.String(60), index=True)
+    email = db.Column(db.String(60), index=True)
+    message = db.Column(db.String(500), index=True)

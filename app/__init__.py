@@ -1,9 +1,7 @@
 #----------------------------------------------------------------------------#
 
 # third-party imports
-from flask import Flask, render_template, abort
-# pip install flask-bootstrap #
-from flask_bootstrap import Bootstrap
+from flask import Flask
 # pip install flask-login #
 from flask_login import LoginManager
 # pip install flask-migrate #
