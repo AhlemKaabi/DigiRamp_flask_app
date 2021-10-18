@@ -67,7 +67,7 @@ class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 
 						{% endwith %}
 					</div>
 						<h4 style="text-align:center;">All Flights for {{ current_user.first_name}} {{ current_user.last_name}}</h4>
-					{% if flights and processes %}
+					{% if flights or processes %}
 						<hr class="intro-divider">
 						<div class="center">
 						{% for flight in flights%}
@@ -111,7 +111,7 @@ class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 
 					{% else %}
 					<div style="text-align: center">
 						<div style="text-align: center">
-							<h3> No Flight have been added. </h3>
+							<h3> No Flight have been Operated.</h3>
 							<hr class="intro-divider">
 						</div>
 					</div>

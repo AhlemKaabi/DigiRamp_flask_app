@@ -1,8 +1,7 @@
 from flask import flash, redirect, render_template, url_for, jsonify
 from flask.globals import request
 from flask_login import login_required, current_user
-from requests import NullHandler
-
+import datetime
 from . import dashboard
 from .forms import FlightForm
 from .. import db
@@ -21,6 +20,37 @@ def list_flights():
 
     return render_template('dashboard/flights/flights.html', flights=flights)
 
+
+def transform_date(date):
+    transformed_date = ""
+    months = {
+        "01": "JAN",
+        "02": "FEB",
+        "03": "MAR",
+        "04": "APR",
+        "05": "MAY",
+        "06": "JUN",
+        "07": "JUL",
+        "08": "AUG",
+        "09": "SEP",
+        "10": "OCT",
+        "11": "NOV",
+        "12": "DEC",
+    }
+    if date:
+        date_split = date.split('-')
+        if len(date_split) == 3:
+            year = str(date_split[0])[-2:] #select the last 2 char , this is who the year is represented in the loadsheet
+            month = date_split[1]
+            day = date_split[2]
+    else:
+        return date
+    for Mon_C, Mon_L in months.items():
+        if Mon_C == month:
+            month = Mon_L
+    transformed_date = ''.join([day, month, year])
+    return transformed_date
+
 # dashboard to start the ramp operations!
 @dashboard.route('/flights/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -37,6 +67,7 @@ def start_operation(id):
     flight_data["destination"] = flight.destination
     flight_data["aircraft_registration"] = flight.aircraft_registration
     flight_data["id"] = flight.id
+    flight_data["date"] = flight.date
 
     return render_template('dashboard/rampdashboard.html', title="Dashboard", flight_data=flight_data)
 
@@ -51,10 +82,12 @@ def add_flight():
     add_flight = True
     form = FlightForm()
     if form.validate_on_submit():
+        today = str(datetime.date.today())
         flight = Flight(flight_number=form.flight_number.data.upper(),
                         departure=form.departure.data.upper(),
                         destination=form.destination.data.upper(),
                         aircraft_registration=form.aircraft_registration.data.upper(),
+                        date = transform_date(today),
                         rampagent_id = current_user.id)
         try:
             # add flight to the database and start ramp operations

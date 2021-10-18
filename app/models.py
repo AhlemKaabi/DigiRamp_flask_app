@@ -71,6 +71,7 @@ class Flight(db.Model):
     departure = db.Column(db.String(20), index=True)
     destination = db.Column(db.String(20), index=True)
     aircraft_registration = db.Column(db.String(20), index=True)
+    date = db.Column(db.String(20), index=True)
     rampagent_id = db.Column(db.Integer, db.ForeignKey('rampagents.id'))
 
 
