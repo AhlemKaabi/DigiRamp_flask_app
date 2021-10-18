@@ -174,7 +174,10 @@ def operated_flights():
 
 # inside the tables section 2- list all countries(departure or arrival) data! form the API based on the iata_code
 # with its specific search feature!
+from app import cache
+
 @dashboard.route('/list-airports-IATA-code', methods=['GET', 'POST'])
+@cache.cached(timeout=1000)
 @login_required
 def iata_code():
     """
