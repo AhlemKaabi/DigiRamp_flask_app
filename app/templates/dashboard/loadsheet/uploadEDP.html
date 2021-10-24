@@ -1,0 +1,83 @@
+{% extends "base.html"%}
+{% block stylesheet_links%}
+	<!-- Custom fonts for this template-->
+	<link href="../../../static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+	<link
+		href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		rel="stylesheet">
+
+	<!-- Custom styles for this template-->
+	<link href="../../../static/css/sb-admin-2.min.css" rel="stylesheet">
+{% endblock%}
+{% block title %}{{ title }}{% endblock %}
+{% block script_links%}
+	<!-- Bootstrap core JavaScript-->
+	<script src="../../../static/vendor/jquery/jquery.min.js"></script>
+	<script src="../../../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Core plugin JavaScript-->
+	<script src="../../../static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+	<!-- Custom scripts for all pages-->
+	<script src="../../../static/js/sb-admin-2.min.js"></script>
+
+	<!-- Page level plugins -->
+	<script src="../../../static/vendor/chart.js/Chart.min.js"></script>
+
+	<!-- Page level custom scripts -->
+	<script src="../../../static/js/demo/chart-area-demo.js"></script>
+	<script src="../../../static/js/demo/chart-pie-demo.js"></script>
+{% endblock%}
+{% block undraw_profile_1%}../../../static/img/undraw_profile_1.svg{% endblock%}
+{% block undraw_profile%}../../../static/img/undraw_profile.svg{% endblock%}
+{% block content %}
+<!-- Begin Page Content -->
+<div class="container-fluid">
+	<!-- Outer Row -->
+	<div class="row justify-content-center">
+
+		<div class="col-xl-6 col-lg-1 col-md-10">
+
+			<div class="card o-hidden border-0 shadow-lg my-5">
+				<div class="card-body p-4">
+					<!-- Nested Row within Card Body -->
+					<div class="container-fluid">
+						<!-- button for upload a photo to the databases! -->
+						<div class="text-center">
+							{% with messages = get_flashed_messages() %}
+								{% if messages %}
+									{% for msg in messages %}
+										<p>{{ msg }}</p>
+									{% endfor %}
+								{% endif %}
+							{% endwith %}
+						</div>
+						<form method="POST" action="" enctype="multipart/form-data">
+							{{ form.hidden_tag() }}
+							<fieldset class="form-group">
+								<legend class="border-bottom mb-4">Add The Flight Loadsheet </legend>
+								<div class="form-group">
+									{{ form.flight_number(class="form-control form-control-user", placeholder="Flight number", style="text-transform:uppercase")}}
+								</div>
+								<div class="form-group">
+									{{ form.picture.label() }}
+									{{ form.picture(class="form-control-file") }}
+									{% if form.picture.errors %}
+										{% for error in form.picture.errors %}
+											<span class="text-danger">{{ error }}</span></br>
+										{% endfor %}
+									{% endif %}
+								</div>
+							</fieldset>
+							<div class="form-group">
+								{{ form.submit(class="btn btn-outline-info") }}
+							</div>
+						</form>
+						<!-- <img src="../../../static/img/loadsheet_exp.png"> -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock%}

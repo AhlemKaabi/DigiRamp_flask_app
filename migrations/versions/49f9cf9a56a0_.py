@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 8bbdb9c95e73
+Revision ID: 49f9cf9a56a0
 Revises: 
-Create Date: 2021-10-18 21:52:42.869758
+Create Date: 2021-10-24 12:26:36.297289
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8bbdb9c95e73'
+revision = '49f9cf9a56a0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,6 +30,16 @@ def upgrade():
     op.create_index(op.f('ix_contacts_first_name'), 'contacts', ['first_name'], unique=False)
     op.create_index(op.f('ix_contacts_last_name'), 'contacts', ['last_name'], unique=False)
     op.create_index(op.f('ix_contacts_message'), 'contacts', ['message'], unique=False)
+    op.create_table('pics',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=128), nullable=True),
+    sa.Column('data', sa.LargeBinary(), nullable=True),
+    sa.Column('rendered_data', sa.Text(), nullable=True),
+    sa.Column('text', sa.Text(), nullable=True),
+    sa.Column('location', sa.String(length=64), nullable=True),
+    sa.Column('pic_date', sa.DateTime(), nullable=False),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('rampagents',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(length=60), nullable=True),
@@ -93,6 +103,7 @@ def downgrade():
     op.drop_index(op.f('ix_rampagents_first_name'), table_name='rampagents')
     op.drop_index(op.f('ix_rampagents_email'), table_name='rampagents')
     op.drop_table('rampagents')
+    op.drop_table('pics')
     op.drop_index(op.f('ix_contacts_message'), table_name='contacts')
     op.drop_index(op.f('ix_contacts_last_name'), table_name='contacts')
     op.drop_index(op.f('ix_contacts_first_name'), table_name='contacts')

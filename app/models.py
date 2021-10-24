@@ -1,11 +1,4 @@
 
-# a model is a representation of a database table in code.
-# my database tables:
-# RampAgent
-# Flight
-# contact
-# processes_data
-
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 # generate_password_hash, which allows us to hash passwords
@@ -73,6 +66,7 @@ class Flight(db.Model):
     aircraft_registration = db.Column(db.String(20), index=True)
     date = db.Column(db.String(20), index=True)
     rampagent_id = db.Column(db.Integer, db.ForeignKey('rampagents.id'))
+    flight_loadsheet = db.Column(db.String(20), index=True)
 
 
     def __repr__(self):
@@ -105,7 +99,7 @@ class Contact(db.Model):
     __tablename__ = 'contacts'
 
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(60), index=True,)
+    first_name = db.Column(db.String(60), index=True)
     last_name = db.Column(db.String(60), index=True)
     email = db.Column(db.String(60), index=True)
     message = db.Column(db.String(500), index=True)

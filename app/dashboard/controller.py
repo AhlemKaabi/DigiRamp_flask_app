@@ -3,9 +3,11 @@ from flask.globals import request
 from flask_login import login_required, current_user
 import datetime
 from . import dashboard
-from .forms import FlightForm
+from .forms import FlightForm, UploadLoadsheet, DisplayLoadsheet
 from .. import db
 from ..models import Flight, Process
+import os
+import secrets
 
 processes = ["Deplanement", "Unloading", "Refuling", "Catering", "Cleaning", "Bording", "Loading", "Pushback"]
 
@@ -68,6 +70,7 @@ def start_operation(id):
     flight_data["aircraft_registration"] = flight.aircraft_registration
     flight_data["id"] = flight.id
     flight_data["date"] = flight.date
+    processes = Process.query.filter_by(flight_id=id).all()
 
     return render_template('dashboard/rampdashboard.html', title="Dashboard", flight_data=flight_data)
 
@@ -147,13 +150,63 @@ def show_manual_loadsheet():
     """
     return render_template('dashboard/loadsheet/manual.html')
 
-@dashboard.route('/flights/EDP-Loadsheet', methods=['GET', 'POST'])
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(4)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join('/home/ahlemkaabi/Desktop/PFA/Perform_better_flask_app/app/static/uploads', picture_fn)
+    print(picture_path)
+    form_picture.save(picture_path)
+    return picture_fn
+
+
+@dashboard.route('/flights/upload-EDP-loadsheet', methods=['GET', 'POST'])
 @login_required
-def show_EDP_loadsheet():
+def upload_EDP_loadsheet():
     """
-    show EDP loadsheet loadsheet
+    upload EDP Loadsheet
     """
-    return render_template('dashboard/loadsheet/EDP.html')
+    form = UploadLoadsheet()
+    if form.validate_on_submit():
+        flight = Flight.query.filter_by(flight_number=form.flight_number.data.upper()).first()
+        if flight:
+            if form.picture.data:
+                print("validate on submit")
+                picture_file = save_picture(form.picture.data)
+                print(picture_file)
+                print("save flight loadsheet")
+                flight.flight_loadsheet = picture_file
+                print(flight.flight_loadsheet)
+                db.session.commit()
+                flash('Loadsheet have been added!')
+        else:
+            flash('There is not Flight Number'.format(form.flight_number.data.upper()))
+
+        return redirect(url_for('dashboard.upload_EDP_loadsheet'))
+    return render_template('dashboard/loadsheet/uploadEDP.html', form=form)
+
+
+
+@dashboard.route('/flights/display-EDP-loadsheet', methods=['GET', 'POST'])
+@login_required
+def display_EDP_loadsheet():
+    """
+    display EDP Loadsheet
+    """
+    flight_loadsheet = ""
+    form = DisplayLoadsheet()
+    if form.validate_on_submit():
+        flight = Flight.query.filter_by(flight_number=form.flight_number.data.upper()).first()
+        if flight:
+                flight_loadsheet = flight.flight_loadsheet
+                flash('Loadsheet have been displayed!')
+                print(flight_loadsheet)
+        else:
+            flash('There is no Flight Number'.format(form.flight_number.data.upper()))
+    return render_template('dashboard/loadsheet/displayEDP.html', form=form, flight_loadsheet=flight_loadsheet)
+
+
+
 
 # inside the tables section 1- list all flights operations data!
 # with its specific search feature!
