@@ -1,24 +1,59 @@
 from flask import flash, redirect, render_template, url_for, jsonify
 from flask.globals import request
 from flask_login import login_required, current_user
-
+import datetime
 from . import dashboard
-from .forms import FlightForm
+from .forms import FlightForm, UploadLoadsheet, DisplayLoadsheet
 from .. import db
 from ..models import Flight, Process
+import os
+import secrets
 
 processes = ["Deplanement", "Unloading", "Refuling", "Catering", "Cleaning", "Bording", "Loading", "Pushback"]
 
+# list the ramp agent operated flights!
 @dashboard.route('/flights', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def list_flights():
     """
     List all flights
     """
-    flights = Flight.query.all()
+    flights = Flight.query.filter_by(rampagent_id = current_user.id)
+
     return render_template('dashboard/flights/flights.html', flights=flights)
 
 
+def transform_date(date):
+    transformed_date = ""
+    months = {
+        "01": "JAN",
+        "02": "FEB",
+        "03": "MAR",
+        "04": "APR",
+        "05": "MAY",
+        "06": "JUN",
+        "07": "JUL",
+        "08": "AUG",
+        "09": "SEP",
+        "10": "OCT",
+        "11": "NOV",
+        "12": "DEC",
+    }
+    if date:
+        date_split = date.split('-')
+        if len(date_split) == 3:
+            year = str(date_split[0])[-2:] #select the last 2 char , this is who the year is represented in the loadsheet
+            month = date_split[1]
+            day = date_split[2]
+    else:
+        return date
+    for Mon_C, Mon_L in months.items():
+        if Mon_C == month:
+            month = Mon_L
+    transformed_date = ''.join([day, month, year])
+    return transformed_date
+
+# dashboard to start the ramp operations!
 @dashboard.route('/flights/<int:id>', methods=['GET', 'POST'])
 @login_required
 def start_operation(id):
@@ -34,24 +69,28 @@ def start_operation(id):
     flight_data["destination"] = flight.destination
     flight_data["aircraft_registration"] = flight.aircraft_registration
     flight_data["id"] = flight.id
+    flight_data["date"] = flight.date
+    processes = Process.query.filter_by(flight_id=id).all()
 
     return render_template('dashboard/rampdashboard.html', title="Dashboard", flight_data=flight_data)
 
-
+# add a new flight
 @dashboard.route('/flights/add', methods=['GET', 'POST'])
 @login_required
 def add_flight():
     """
-    Add a department to the database
+    Add a flight to the database
     """
     #check current user
     add_flight = True
     form = FlightForm()
     if form.validate_on_submit():
+        today = str(datetime.date.today())
         flight = Flight(flight_number=form.flight_number.data.upper(),
                         departure=form.departure.data.upper(),
                         destination=form.destination.data.upper(),
                         aircraft_registration=form.aircraft_registration.data.upper(),
+                        date = transform_date(today),
                         rampagent_id = current_user.id)
         try:
             # add flight to the database and start ramp operations
@@ -70,7 +109,7 @@ def add_flight():
 
 
 
-
+# edit a flight
 @dashboard.route('/flights/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_flight(id):
@@ -104,32 +143,119 @@ def edit_flight(id):
                            flight=flight, title="Edit Flight")
 
 @dashboard.route('/flights/Manual-Loadsheet', methods=['GET', 'POST'])
+@login_required
 def show_manual_loadsheet():
     """
     show manual loadsheet
     """
     return render_template('dashboard/loadsheet/manual.html')
 
-@dashboard.route('/flights/EDP-Loadsheet', methods=['GET', 'POST'])
-def show_EDP_loadsheet():
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(4)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join('/home/ahlemkaabi/Desktop/PFA/Perform_better_flask_app/app/static/uploads', picture_fn)
+    print(picture_path)
+    form_picture.save(picture_path)
+    return picture_fn
+
+
+@dashboard.route('/flights/upload-EDP-loadsheet', methods=['GET', 'POST'])
+@login_required
+def upload_EDP_loadsheet():
     """
-    show EDP loadsheet loadsheet
+    upload EDP Loadsheet
     """
-    return render_template('dashboard/loadsheet/EDP.html')
+    form = UploadLoadsheet()
+    if form.validate_on_submit():
+        flight = Flight.query.filter_by(flight_number=form.flight_number.data.upper()).first()
+        if flight:
+            if form.picture.data:
+                print("validate on submit")
+                picture_file = save_picture(form.picture.data)
+                print(picture_file)
+                print("save flight loadsheet")
+                flight.flight_loadsheet = picture_file
+                print(flight.flight_loadsheet)
+                db.session.commit()
+                flash('Loadsheet have been added!')
+        else:
+            flash('There is not Flight Number'.format(form.flight_number.data.upper()))
 
-@dashboard.route('/list-all-flights', methods=['GET', 'POST'])
-def all_flights():
-    flights = Flight.query.all()
-    processes = Process.query.all()
-    return render_template('dashboard/tables/all_flights.html', flights=flights, processes=processes)
+        return redirect(url_for('dashboard.upload_EDP_loadsheet'))
+    return render_template('dashboard/loadsheet/uploadEDP.html', form=form)
 
 
 
+@dashboard.route('/flights/display-EDP-loadsheet', methods=['GET', 'POST'])
+@login_required
+def display_EDP_loadsheet():
+    """
+    display EDP Loadsheet
+    """
+    flight_loadsheet = ""
+    form = DisplayLoadsheet()
+    if form.validate_on_submit():
+        flight = Flight.query.filter_by(flight_number=form.flight_number.data.upper()).first()
+        if flight:
+                flight_loadsheet = flight.flight_loadsheet
+                flash('Loadsheet have been displayed!')
+                print(flight_loadsheet)
+        else:
+            flash('There is no Flight Number'.format(form.flight_number.data.upper()))
+    return render_template('dashboard/loadsheet/displayEDP.html', form=form, flight_loadsheet=flight_loadsheet)
+
+
+
+
+# inside the tables section 1- list all flights operations data!
+# with its specific search feature!
+@dashboard.route('/list-operated_flights', methods=['GET', 'POST'])
+@login_required
+def operated_flights():
+    """
+    list all operated flights tables!
+    """
+    q = request.args.get('q')
+    if q:
+        flights = Flight.query.filter(Flight.flight_number.contains(q))
+        processes = Process.query.all()
+    else:
+        flights = Flight.query.all()
+        processes = Process.query.all()
+    return render_template('dashboard/tables/operated_flights.html', flights=flights, processes=processes)
+
+# inside the tables section 2- list all countries(departure or arrival) data! form the API based on the iata_code
+# with its specific search feature!
+from app import cache
+
+@dashboard.route('/list-airports-IATA-code', methods=['GET', 'POST'])
+@cache.cached(timeout=100000)
+@login_required
+def iata_code():
+    """
+    list all flight tables!
+    """
+    from datapackage import Package
+    package = Package('https://datahub.io/core/airport-codes/datapackage.json')
+    # print list of all resources:
+    print(package.resource_names)
+    airport_data = []
+    # print processed tabular data (if exists any)
+    for resource in package.resources:
+        if resource.descriptor['datahub']['type'] == 'derived/csv':
+            print(type(resource))
+            print(resource.schema.descriptor)
+            for airport_code in resource.read(keyed=True):
+                if airport_code["iata_code"] != None:
+                    airport_data.append({"name": airport_code["name"], "municipality": airport_code["municipality"], "iso_country": airport_code["iso_country"], "ident": airport_code["ident"], "iata_code": airport_code["iata_code"]})
+    return render_template('dashboard/tables/iata_code.html', airport_data=airport_data)
 
 #### Processes ####
 
 deplanement_data = []
 @dashboard.route('/deplanement/<int:id>', methods=['POST'])
+@login_required
 def deplanement(id):
     flight = Flight.query.get_or_404(id)
     Status=""
@@ -165,8 +291,9 @@ def deplanement(id):
                 StartTime = next(iter(item.items()))[1]
                 if StartTime:
                     StartTimeUpdate = Process.query.get(deplanement.id)
-                    StartTimeUpdate.start_time = StartTime
-                    db.session.commit()
+                    if StartTimeUpdate.start_time == None:
+                        StartTimeUpdate.start_time = StartTime
+                        db.session.commit()
 
             if next(iter(item)) == "EndTime":
                 print("this is the EndTime: ")
@@ -174,14 +301,16 @@ def deplanement(id):
                 EndTime = next(iter(item.items()))[1]
                 if EndTime:
                     EndTimeUpdate = Process.query.get(deplanement.id)
-                    EndTimeUpdate.end_time = EndTime
-                    db.session.commit()
+                    if EndTimeUpdate.end_time == None:
+                        EndTimeUpdate.end_time = EndTime
+                        db.session.commit()
 
     return jsonify(dataReply)
 
 
 unloading_data = []
 @dashboard.route('/unloading/<int:id>', methods=['POST'])
+@login_required
 def unloading(id):
     flight = Flight.query.get_or_404(id)
     Status=""
@@ -217,8 +346,10 @@ def unloading(id):
                 StartTime = next(iter(item.items()))[1]
                 if StartTime:
                     StartTimeUpdate = Process.query.get(unloading.id)
-                    StartTimeUpdate.start_time = StartTime
-                    db.session.commit()
+                    if StartTimeUpdate.start_time == None:
+
+                        StartTimeUpdate.start_time = StartTime
+                        db.session.commit()
 
             if next(iter(item)) == "EndTime":
                 print("this is the EndTime: ")
@@ -226,8 +357,9 @@ def unloading(id):
                 EndTime = next(iter(item.items()))[1]
                 if EndTime:
                     EndTimeUpdate = Process.query.get(unloading.id)
-                    EndTimeUpdate.end_time = EndTime
-                    db.session.commit()
+                    if EndTimeUpdate.end_time == None:
+                        EndTimeUpdate.end_time = EndTime
+                        db.session.commit()
 
     return jsonify(dataReply)
 
@@ -235,6 +367,7 @@ def unloading(id):
 
 refuling_data = []
 @dashboard.route('/refuling/<int:id>', methods=['POST'])
+@login_required
 def refuling(id):
     flight = Flight.query.get_or_404(id)
     Status=""
@@ -270,8 +403,9 @@ def refuling(id):
                 StartTime = next(iter(item.items()))[1]
                 if StartTime:
                     StartTimeUpdate = Process.query.get(refuling.id)
-                    StartTimeUpdate.start_time = StartTime
-                    db.session.commit()
+                    if StartTimeUpdate.start_time == None:
+                        StartTimeUpdate.start_time = StartTime
+                        db.session.commit()
 
             if next(iter(item)) == "EndTime":
                 print("this is the EndTime: ")
@@ -279,14 +413,16 @@ def refuling(id):
                 EndTime = next(iter(item.items()))[1]
                 if EndTime:
                     EndTimeUpdate = Process.query.get(refuling.id)
-                    EndTimeUpdate.end_time = EndTime
-                    db.session.commit()
+                    if EndTimeUpdate.end_time == None:
+                        EndTimeUpdate.end_time = EndTime
+                        db.session.commit()
 
     return jsonify(dataReply)
 
 
 catering_data = []
 @dashboard.route('/catering/<int:id>', methods=['POST'])
+@login_required
 def catering(id):
     flight = Flight.query.get_or_404(id)
     Status=""
@@ -322,8 +458,9 @@ def catering(id):
                 StartTime = next(iter(item.items()))[1]
                 if StartTime:
                     StartTimeUpdate = Process.query.get(catering.id)
-                    StartTimeUpdate.start_time = StartTime
-                    db.session.commit()
+                    if StartTimeUpdate.start_time == None:
+                        StartTimeUpdate.start_time = StartTime
+                        db.session.commit()
 
             if next(iter(item)) == "EndTime":
                 print("this is the EndTime: ")
@@ -331,14 +468,16 @@ def catering(id):
                 EndTime = next(iter(item.items()))[1]
                 if EndTime:
                     EndTimeUpdate = Process.query.get(catering.id)
-                    EndTimeUpdate.end_time = EndTime
-                    db.session.commit()
+                    if EndTimeUpdate.end_time == None:
+                        EndTimeUpdate.end_time = EndTime
+                        db.session.commit()
 
     return jsonify(dataReply)
 
 
 cleaning_data = []
 @dashboard.route('/cleaning/<int:id>', methods=['POST'])
+@login_required
 def cleaning(id):
     flight = Flight.query.get_or_404(id)
     Status=""
@@ -374,8 +513,9 @@ def cleaning(id):
                 StartTime = next(iter(item.items()))[1]
                 if StartTime:
                     StartTimeUpdate = Process.query.get(cleaning.id)
-                    StartTimeUpdate.start_time = StartTime
-                    db.session.commit()
+                    if StartTimeUpdate.start_time == None:
+                        StartTimeUpdate.start_time = StartTime
+                        db.session.commit()
 
             if next(iter(item)) == "EndTime":
                 print("this is the EndTime: ")
@@ -383,13 +523,15 @@ def cleaning(id):
                 EndTime = next(iter(item.items()))[1]
                 if EndTime:
                     EndTimeUpdate = Process.query.get(cleaning.id)
-                    EndTimeUpdate.end_time = EndTime
-                    db.session.commit()
+                    if EndTimeUpdate.end_time == None:
+                        EndTimeUpdate.end_time = EndTime
+                        db.session.commit()
 
     return jsonify(dataReply)
 
 bording_data = []
 @dashboard.route('/bording/<int:id>', methods=['POST'])
+@login_required
 def bording(id):
     flight = Flight.query.get_or_404(id)
     Status=""
@@ -425,8 +567,9 @@ def bording(id):
                 StartTime = next(iter(item.items()))[1]
                 if StartTime:
                     StartTimeUpdate = Process.query.get(bording.id)
-                    StartTimeUpdate.start_time = StartTime
-                    db.session.commit()
+                    if StartTimeUpdate.start_time == None:
+                        StartTimeUpdate.start_time = StartTime
+                        db.session.commit()
 
             if next(iter(item)) == "EndTime":
                 print("this is the EndTime: ")
@@ -434,14 +577,16 @@ def bording(id):
                 EndTime = next(iter(item.items()))[1]
                 if EndTime:
                     EndTimeUpdate = Process.query.get(bording.id)
-                    EndTimeUpdate.end_time = EndTime
-                    db.session.commit()
+                    if EndTimeUpdate.end_time == None:
+                        EndTimeUpdate.end_time = EndTime
+                        db.session.commit()
 
     return jsonify(dataReply)
 
 
 loading_data = []
 @dashboard.route('/loading/<int:id>', methods=['POST'])
+@login_required
 def loading(id):
     flight = Flight.query.get_or_404(id)
     Status=""
@@ -477,8 +622,9 @@ def loading(id):
                 StartTime = next(iter(item.items()))[1]
                 if StartTime:
                     StartTimeUpdate = Process.query.get(loading.id)
-                    StartTimeUpdate.start_time = StartTime
-                    db.session.commit()
+                    if StartTimeUpdate.start_time == None:
+                        StartTimeUpdate.start_time = StartTime
+                        db.session.commit()
 
             if next(iter(item)) == "EndTime":
                 print("this is the EndTime: ")
@@ -486,14 +632,16 @@ def loading(id):
                 EndTime = next(iter(item.items()))[1]
                 if EndTime:
                     EndTimeUpdate = Process.query.get(loading.id)
-                    EndTimeUpdate.end_time = EndTime
-                    db.session.commit()
+                    if EndTimeUpdate.end_time == None:
+                        EndTimeUpdate.end_time = EndTime
+                        db.session.commit()
 
     return jsonify(dataReply)
 
 
 pushback_data = []
 @dashboard.route('/pushback/<int:id>', methods=['POST'])
+@login_required
 def pushback(id):
     flight = Flight.query.get_or_404(id)
     Status=""
@@ -529,8 +677,9 @@ def pushback(id):
                 StartTime = next(iter(item.items()))[1]
                 if StartTime:
                     StartTimeUpdate = Process.query.get(pushback.id)
-                    StartTimeUpdate.start_time = StartTime
-                    db.session.commit()
+                    if StartTimeUpdate.start_time == None:
+                        StartTimeUpdate.start_time = StartTime
+                        db.session.commit()
 
             if next(iter(item)) == "EndTime":
                 print("this is the EndTime: ")
@@ -538,7 +687,7 @@ def pushback(id):
                 EndTime = next(iter(item.items()))[1]
                 if EndTime:
                     EndTimeUpdate = Process.query.get(pushback.id)
-                    EndTimeUpdate.end_time = EndTime
-                    db.session.commit()
-
+                    if EndTimeUpdate.end_time == None:
+                        EndTimeUpdate.end_time = EndTime
+                        db.session.commit()
     return jsonify(dataReply)

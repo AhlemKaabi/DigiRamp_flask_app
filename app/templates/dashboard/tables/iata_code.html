@@ -1,0 +1,110 @@
+{% extends "base.html"%}
+<!-- ################################################################ -->
+
+{% block stylesheet_links%}
+	<!-- Custom fonts for this template-->
+	<link href="../../../static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+	<link
+		href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+		rel="stylesheet">
+
+	<!-- Custom styles for this template-->
+	<link href="../../../static/css/sb-admin-2.min.css" rel="stylesheet">
+{% endblock%}
+{% block title %}IATA Codes{% endblock %}
+{% block script_links%}
+	<!-- Bootstrap core JavaScript-->
+	<script src="../../../static/vendor/jquery/jquery.min.js"></script>
+	<script src="../../../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Core plugin JavaScript-->
+	<script src="../../../static/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+	<!-- Custom scripts for all pages-->
+	<script src="../../../static/js/sb-admin-2.min.js"></script>
+
+	<!-- Page level plugins -->
+	<script src="../../../static/vendor/chart.js/Chart.min.js"></script>
+
+	<!-- Page level custom scripts -->
+	<script src="../../../static/js/demo/chart-area-demo.js"></script>
+	<script src="../../../static/js/demo/chart-pie-demo.js"></script>
+{% endblock%}
+{% block undraw_profile_1%}../../../static/img/undraw_profile_1.svg{% endblock%}
+{% block undraw_profile%}../../../static/img/undraw_profile.svg{% endblock%}
+
+{% block search %}
+<!-- Topbar Search -->
+<form method="GET"
+class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+<div class="input-group">
+	<input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+		aria-label="Search" aria-describedby="basic-addon2" name="q">
+	<div class="input-group-append">
+		<button id="SearchButton" class="btn btn-primary" type="submit">
+			<i class="fas fa-search fa-sm"></i>
+		</button>
+	</div>
+</div>
+</form>
+{% endblock %}
+{% block content %}
+<div class="container">
+	<div class="content-section">
+		<div class="outer">
+			<div class="middle">
+				<div class="inner">
+					<h4 style="text-align:center;">IATA Airports Codes</h4>
+					{% if airport_data %}
+						<hr class="intro-divider">
+						<div class="center">
+								<div class="col-xl-12 col-lg-7">
+									<div class="card shadow mb-4">
+										<div class="card-header py-3">
+											<h6 class="m-0 font-weight-bold text-primary">IATA Airports Codes</h6>
+										</div>
+										<div class="card-body">
+											<div class="table-responsive">
+												<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+													<thead>
+														<tr>
+															<th>Airport Name</th>
+															<th>ISO Country Code</th>
+															<th>Municipality</th>
+															<th>Airport Indent</th>
+															<th>IATA Code</th>
+														</tr>
+													</thead>
+													<tbody>
+														{% for data in airport_data %}
+															<tr>
+																<td>{{ data["name"] }}</td>
+																<td>{{ data["iso_country"] }}</td>
+																<td>{{ data["municipality"] }}</td>
+																<td>{{ data["ident"] }}</td>
+																<td>{{ data["iata_code"] }}</td>
+
+															</tr>
+														{% endfor %}
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+						</div>
+					{% else %}
+					<div style="text-align: center">
+						<div style="text-align: center">
+							<h3> there in so Airport Code available</h3>
+							<hr class="intro-divider">
+						</div>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+ <!-- /.container-fluid -->
+{% endblock%}

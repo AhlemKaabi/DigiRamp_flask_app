@@ -1,12 +1,4 @@
 
-# a model is a representation of a database table in code.
-# my database tables:
-# RampAgent
-# Flight
-# contact
-# processes_data
-
-import app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 # generate_password_hash, which allows us to hash passwords
@@ -72,7 +64,9 @@ class Flight(db.Model):
     departure = db.Column(db.String(20), index=True)
     destination = db.Column(db.String(20), index=True)
     aircraft_registration = db.Column(db.String(20), index=True)
+    date = db.Column(db.String(20), index=True)
     rampagent_id = db.Column(db.Integer, db.ForeignKey('rampagents.id'))
+    flight_loadsheet = db.Column(db.String(20), index=True)
 
 
     def __repr__(self):
@@ -95,10 +89,17 @@ class Process(db.Model):
     flight_id = db.Column(db.Integer, db.ForeignKey('flights.id'))
     rampagent_id = db.Column(db.Integer, db.ForeignKey('rampagents.id'))
 
-#     def __repr__(self):
-#         return '<Process: {}>'.format(self.process_name)
-# #######################
-# 	# backref allows us to create a new property on the RampAgent model
-# 	# such that we can use ' rampagent.flight ' or ' rampagent.process '
-# # 	# to get the flight or process assigned to that rampagent
-# # ######################
+    def __repr__(self):
+        return '<Process: {}>'.format(self.process_name)
+
+class Contact(db.Model):
+    """
+    Create a contact table
+    """
+    __tablename__ = 'contacts'
+
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(60), index=True)
+    last_name = db.Column(db.String(60), index=True)
+    email = db.Column(db.String(60), index=True)
+    message = db.Column(db.String(500), index=True)

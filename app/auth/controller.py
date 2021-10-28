@@ -1,4 +1,4 @@
-from flask import flash, redirect, render_template, url_for, request
+from flask import flash, redirect, render_template, url_for, session
 from flask_login import login_required, login_user, logout_user
 
 from . import auth
@@ -38,6 +38,7 @@ def login():
         # check whether rampagent exists in the database and whether
         # the password entered matches the password in the database
         rampagent = RampAgent.query.filter_by(email=form.email.data).first()
+
         if rampagent is not None and rampagent.verify_password(form.password.data):
             # log employee in
             login_user(rampagent)
@@ -62,4 +63,4 @@ def logout():
     logout_user()
     flash('You have successfully been logged out.', 'info')
     # redirect to the login page
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('landing.landingpage'))

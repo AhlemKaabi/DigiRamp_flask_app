@@ -1,3 +1,4 @@
 *.pyc
 to-do
 Database_setup
+instance/

@@ -199,6 +199,8 @@ figure {
 }
 
 img {
+  max-width: 100% !important;
+  height: auto !important;
   vertical-align: middle;
   border-style: none;
 }

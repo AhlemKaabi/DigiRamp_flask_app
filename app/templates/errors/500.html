@@ -11,6 +11,8 @@
 	<!-- Custom styles for this template-->
 	<link href="../../../static/css/sb-admin-2.min.css" rel="stylesheet">
 {% endblock%}
+{% block favicon%}{% endblock%}
+
 {% block title %}Internal Server Error{% endblock %}
 {% block script_links%}
 	<!-- Bootstrap core JavaScript-->
@@ -41,9 +43,9 @@
             <h1> 500 Error </h1>
             <h3> The server encountered an internal error. That's all we know. </h3>
             <hr class="intro-divider">
-            <a href="{{ url_for('dashboard.list_flights') }}" class="btn btn-default btn-lg">
+            <a href="{{ url_for('landing.landingpage') }}" class="btn btn-default btn-lg">
                 <i class="fa fa-home"></i>
-                Home
+                Landing Page
             </a>
         </div>
       </div>
