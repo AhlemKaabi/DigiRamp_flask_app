@@ -330,7 +330,7 @@
 					<!-- End of Topbar -->
 					{% block content %}{% endblock %}
 					<!-- Footer -->
-					<footer class="sticky-footer bg-white fixed-bottom">
+					<footer style="position: relative; margin-top: 550px" class="sticky-footer bg-white">
 						<div class="container my-auto">
 							<div class="copyright text-center my-auto">
 								<span>Copyright &copy; 2021 - DigiRamp</span>
@@ -364,7 +364,7 @@
 					<div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
 					<div class="modal-footer">
 						<button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-						<a class="btn btn-primary" href="{{ url_for('auth.login') }}">Logout</a>
+						<a class="btn btn-primary" href="{{ url_for('landing.landingpage') }}">Logout</a>
 					</div>
 					</div>
 				</div>

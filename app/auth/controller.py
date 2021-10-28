@@ -63,4 +63,4 @@ def logout():
     logout_user()
     flash('You have successfully been logged out.', 'info')
     # redirect to the login page
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('landing.landingpage'))

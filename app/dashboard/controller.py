@@ -230,7 +230,7 @@ def operated_flights():
 from app import cache
 
 @dashboard.route('/list-airports-IATA-code', methods=['GET', 'POST'])
-@cache.cached(timeout=1000)
+@cache.cached(timeout=100000)
 @login_required
 def iata_code():
     """

@@ -29,5 +29,5 @@ class DisplayLoadsheet(FlaskForm):
     display flight loadsheet
     """
     flight_number = StringField('Flight number',validators=[DataRequired()])
-    submit = SubmitField('add loadsheet')
-    
+    submit = SubmitField('Display loadsheet')
+
