@@ -3,8 +3,8 @@
 ## Table of Content :mag_right:
 
 - [Introduction](#Introduction)
-- [Environment](#Environment)
-- [Installation](#Installation)
+- [Environment](#Environment )
+- [Installation](#Installation:floppy_disk:)
 - [Technologies](#Technologies)
 - [Usage](#Usage)
 - [License](#License)
