@@ -11,7 +11,7 @@
 
 # Introduction :page_with_curl:
 
-<img src="images/landingpage.png">
+<img src="img/blog.png">
 
 DigiRamp is a web application written in flask micro-framework. It is a solution for airline companies that offers leaner communication across multiple departments while preparing the aircraft for the next flight.
 
