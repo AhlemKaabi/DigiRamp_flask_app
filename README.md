@@ -2,12 +2,12 @@
 
 ## Table of Content :mag_right:
 
-- [Introduction](#Introduction)
-- [Environment](#Environment)
-- [Installation](#Installation)
-- [Technologies](#Technologies)
-- [Usage](#Usage)
-- [License](#License)
+- [Introduction](#Introduction-page_with_curl)
+- [Environment](#Environment-wrench)
+- [Installation](#Installation-inbox_tray)
+- [Technologies](#Technologies-computer)
+- [Usage](#Usage-airplane)
+- [License](#License-lock)
 
 # Introduction :page_with_curl:
 
@@ -22,11 +22,11 @@ do not use any real information(emails-password on the demo)!! the app is still 
 Ahlem kaabi
 [linked-in](https://www.linkedin.com/in/k-ahlem/)
 
-# Environment
+# Environment :wrench:
 
 This project is interpreted/tested on Ubuntu 20.04 LTS using python3 (version 3.8.10) and MySql ( Ver 8.0.26-0ubuntu0.20.04.2 )
 
-# Installation :floppy_disk:
+# Installation :inbox_tray:
 This guide will help you to start using the web application in your local environment
 
 ### Requirements:
