@@ -2,9 +2,9 @@
 
 ## Table of Content :mag_right:
 
-- [Introduction](#Introduction)
-- [Environment](#Environment )
-- [Installation](#Installation:floppy_disk:)
+- [Introduction](#Introduction-:page_with_curl:)
+- [Environment](#Environment)
+- [Installation](#Installation)
 - [Technologies](#Technologies)
 - [Usage](#Usage)
 - [License](#License)
