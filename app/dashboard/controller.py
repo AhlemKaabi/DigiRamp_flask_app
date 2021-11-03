@@ -1,22 +1,31 @@
+"""
+    Importing the needed modules to build the controllers function that will
+    handle the authentication blueprint.
+"""
 from flask import flash, redirect, render_template, url_for, jsonify
 from flask.globals import request
 from flask_login import login_required, current_user
 import datetime
+# Import the blueprint.
 from . import dashboard
+# Import the needed class forms.
 from .forms import FlightForm, UploadLoadsheet, DisplayLoadsheet
+# Import the database variable.
 from .. import db
+# Import the Flight and the Process models.
 from ..models import Flight, Process
+# Import more useful moduels.
 import os
 import secrets
 
-processes = ["Deplanement", "Unloading", "Refuling", "Catering", "Cleaning", "Bording", "Loading", "Pushback"]
 
-# list the ramp agent operated flights!
+
 @dashboard.route('/flights', methods=['GET', 'POST'])
 @login_required
 def list_flights():
     """
-    List all flights
+    Handle requests to the /flights route
+    List all the operated flights for the current loged in Ramp agent(employee).
     """
     flights = Flight.query.filter_by(rampagent_id = current_user.id)
 
@@ -24,6 +33,10 @@ def list_flights():
 
 
 def transform_date(date):
+    """
+    Transform the date string to another style that is specific
+    to the aeronautic field.
+    """
     transformed_date = ""
     months = {
         "01": "JAN",
@@ -53,16 +66,17 @@ def transform_date(date):
     transformed_date = ''.join([day, month, year])
     return transformed_date
 
-# dashboard to start the ramp operations!
 @dashboard.route('/flights/<int:id>', methods=['GET', 'POST'])
 @login_required
 def start_operation(id):
     """
-    render the ramp agent dashboard template
-    start operations
+    Handle requests to the /flights/<int:id> route
+    Render the ramp agent dashboard template to start operating
+    the flight with id=id.
     """
 
     flight = Flight.query.get_or_404(id)
+    # Create a dictionay that contains the needed informations about a flight to display.
     flight_data ={}
     flight_data["flight_number"] = flight.flight_number
     flight_data["departure"] = flight.departure
@@ -70,21 +84,23 @@ def start_operation(id):
     flight_data["aircraft_registration"] = flight.aircraft_registration
     flight_data["id"] = flight.id
     flight_data["date"] = flight.date
-    processes = Process.query.filter_by(flight_id=id).all()
-
+    # load the operate flight dashbord template.
     return render_template('dashboard/rampdashboard.html', title="Dashboard", flight_data=flight_data)
 
-# add a new flight
 @dashboard.route('/flights/add', methods=['GET', 'POST'])
 @login_required
 def add_flight():
     """
-    Add a flight to the database
+    Handle requests to the //flights/add route
+    Form to add a flight to the database
     """
-    #check current user
+    # Add_flight boolean variable: to distinguish which title to put for
+    # the flight form (add er edit).
     add_flight = True
+    # Create a form object from the login form.
     form = FlightForm()
     if form.validate_on_submit():
+        # On submit button save the date!
         today = str(datetime.date.today())
         flight = Flight(flight_number=form.flight_number.data.upper(),
                         departure=form.departure.data.upper(),
@@ -101,10 +117,10 @@ def add_flight():
         except:
             # in case flight number already exists
             flash('Error: flight number already exists.')
+            # redirect to dashborad of the list all operated flights page.
             return redirect(url_for('dashboard.list_flights'))
-        # redirect to departments page
 
-    # load department template
+    # load add flight form template
     return render_template('dashboard/flights/flight.html', form=form, title="Add flight", add_flight=add_flight)
 
 
@@ -116,9 +132,10 @@ def edit_flight(id):
     """
     Edit a flight
     """
-
+    # Add_flight boolean variable: to distinguish which title to put for
+    # The flight form (add er edit).
     add_flight = False
-
+    # edit flight with id!
     flight = Flight.query.get_or_404(id)
     form = FlightForm(obj=flight)
     if form.validate_on_submit():
@@ -127,18 +144,18 @@ def edit_flight(id):
         flight.destination = form.destination.data.upper()
         flight.aircraft_registration = form.aircraft_registration.data.upper()
 
-
+        # Commit to the database.
         db.session.commit()
         flash('You have successfully edited the Flight.')
 
-        # redirect to the flights page
+        # Redirect to the flights page
         return redirect(url_for('dashboard.list_flights'))
 
     form.aircraft_registration.data = flight.aircraft_registration
     form.destination.data = flight.destination
     form.departure.data = flight.departure
     form.flight_number.data = flight.flight_number
-
+    # Load edit flight form template
     return render_template('dashboard/flights/flight.html', add_flight=add_flight, form=form,
                            flight=flight, title="Edit Flight")
 

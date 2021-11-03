@@ -1,9 +1,16 @@
-from flask import flash, redirect, render_template, url_for, session
+"""
+    Importing the needed modules to build the controllers function that will
+    handle the authentication blueprint.
+"""
+from flask import flash, redirect, render_template, url_for
 from flask_login import login_required, login_user, logout_user
-
+# Import the blueprint
 from . import auth
+# Import the needed class forms.
 from .forms import LoginForm, RegistrationForm
+# Import the database variable.
 from .. import db
+# Import the RampAgent model.
 from ..models import RampAgent
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -12,6 +19,7 @@ def register():
     Handle requests to the /register route
     Add a rampagent to the database through the registration form
     """
+    # Create a form object from the registration form.
     form = RegistrationForm()
     if form.validate_on_submit():
         rampagent = RampAgent(email=form.email.data,
@@ -20,11 +28,12 @@ def register():
                             password=form.password.data)
         # add rampagent to the database
         db.session.add(rampagent)
+        # Commit the changes
         db.session.commit()
+        # Print a message to the user.
         flash('You have successfully registered! You may now login.')
         # redirect to the login page
         return redirect(url_for('auth.login'))
-
     return render_template('auth/register.html', form=form, title='Register')
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -33,24 +42,24 @@ def login():
     Handle requests to the /login route
     Log an employee in through the login form
     """
+    # Create a form object from the login form.
     form = LoginForm()
     if form.validate_on_submit():
-        # check whether rampagent exists in the database and whether
-        # the password entered matches the password in the database
         rampagent = RampAgent.query.filter_by(email=form.email.data).first()
-
+        # Check whether rampagent exists in the database and whether
+        # the password entered matches the password in the database.
         if rampagent is not None and rampagent.verify_password(form.password.data):
-            # log employee in
+            # Log employee in.
             login_user(rampagent)
-            # redirect to the appropriate dashboard page --> function inthe controller dashboard that enter the propper template
+            # Redirect to the appropriate dashboard page.
             return redirect(url_for('dashboard.list_flights'))
-        # when login details are incorrect
+        # When login details are incorrect, print messages to inform the user
+        # about the situation!
         else:
             flash('Check your email or password.')
             flash('Check if you are you registered!')
-    # load login template
+    # Load login template.
     return render_template('auth/login.html',title='Login', form=form)
-    # return redirect(url_for('dashboard.list_flights'))
 
 
 @auth.route('/logout')
@@ -62,5 +71,5 @@ def logout():
     """
     logout_user()
     flash('You have successfully been logged out.', 'info')
-    # redirect to the login page
+    # redirect to the landing page
     return redirect(url_for('landing.landingpage'))
