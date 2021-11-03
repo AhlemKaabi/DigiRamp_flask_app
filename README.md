@@ -2,7 +2,7 @@
 
 ## Table of Content :mag_right:
 
-- [Introduction](#Introduction-:page_with_curl:)
+- [Introduction](#Introduction)
 - [Environment](#Environment)
 - [Installation](#Installation)
 - [Technologies](#Technologies)
