@@ -37,15 +37,18 @@ This guide will help you to start using the web application in your local enviro
 
 ### Steps:
 #### Setup the database:
-1. create a database `Your_db_Name`
+1. create a database `Your_db_Name`.
+
 	```
 	CREATE DATABASE Your_db_Name;
 	```
-2. create a user `User_Name` with password `Your_password`
+2. create a user `User_Name` with password `Your_password`.
+
 	```
 	CREATE USER 'User_Name'@'localhost' IDENTIFIED BY 'Your_password';
 	```
-3. for `User_Name` grant all privileges on the `Your_db_Name` database
+3. for `User_Name` grant all privileges on the `Your_db_Name` database.
+
 	```
 	GRANT ALL PRIVILEGES ON Your_db_Name . * TO 'User_Name'@'localhost';
 	```
