@@ -77,47 +77,33 @@ $ export FLASK_APP=run.py
 $ flask run
 ```
 
-<img src="images/flask_run.png">
+<img src="img/readme_pic.png">
 
 # Technologies :computer:
-<img src="images/technologies.png">
-<img src="images/infra.png">
-<img src="images/infra2.png">
+<img src="img/Digiramp.png">
 
 # Usage :steam_locomotive:
 
-## making a reservation
+## Add New flight
+<img src="img/add_flight.png">
 
-### find a playground
+## Supervise a flight turnaround processes:
+<img src="img/supervise.png">
 
-<img src="images/playground_s.png">
+## Upload and display required informations:
+<img src="img/upload_.png">
 
-### Select field and time
+<img src="img/display_.png">
 
-<img src="images/time.png">
+## Display data tables - Operated flight:
+<img src="img/tableoperated.png">
 
-### confirm the reservation
-
-<img src="images/confirm.png">
-
-
-## mangage playgrounds
-
-### create an account
-
-<img src="images/sign_up.png">
-
-### overview
-<img src="images/dashboard.png">
-
-### playgrounds
-<img src="images/dashboard2.png">
-
+## Display airports IATA Codes:
+<img src="img/iata.png">
 # License :lock:
 
 
-This project is licensed under the MIT License see [MIT](https://github.com/alaedine07/I-soccer/blob/main/LICENSE) file for more details
-
+This project is licensed under the MIT License see [MIT LICENSE](https://github.com/AhlemKaabi/DigiRamp_flask_app/blob/main/LICENSE) file for more details
 ### Final word :black_nib:
 
-This project was written as part of the curriculum for Holberton School. Holberton School is a campus-based full-stack software engineering program that prepares students for careers in the tech industry using project-based peer learning. For more information, visit [this link](https://www.holbertonschool.com/).
+This project was written as part of the curriculum for Holberton School. Holberton School's methodology uses project-based learning and peer-learning to teach students the theory and tools needed to adapt to the future and ever-changing technologies. For more information, visit [this link](https://www.holbertonschool.com/).
