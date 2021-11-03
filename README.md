@@ -85,7 +85,7 @@ $ flask run
 # Technologies :computer:
 <img src="img/Digiramp.png">
 
-# Usage :steam_locomotive:
+# Usage :airplane:
 
 ## Add New flight
 <img src="img/add_flight.png">
@@ -103,6 +103,7 @@ $ flask run
 
 ## Display airports IATA Codes:
 <img src="img/iata.png">
+
 # License :lock:
 
 

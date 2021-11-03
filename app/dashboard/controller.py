@@ -242,8 +242,8 @@ def operated_flights():
         processes = Process.query.all()
     return render_template('dashboard/tables/operated_flights.html', flights=flights, processes=processes)
 
-# inside the tables section 2- list all countries(departure or arrival) data! form the API based on the iata_code
-# with its specific search feature!
+# inside the tables section 2- list all countries(departure or arrival)
+# form the API based on the iata_code
 from app import cache
 
 @dashboard.route('/list-airports-IATA-code', methods=['GET', 'POST'])
@@ -255,7 +255,6 @@ def iata_code():
     """
     from datapackage import Package
     package = Package('https://datahub.io/core/airport-codes/datapackage.json')
-    # print list of all resources:
     print(package.resource_names)
     airport_data = []
     # print processed tabular data (if exists any)
@@ -265,7 +264,9 @@ def iata_code():
             print(resource.schema.descriptor)
             for airport_code in resource.read(keyed=True):
                 if airport_code["iata_code"] != None:
-                    airport_data.append({"name": airport_code["name"], "municipality": airport_code["municipality"], "iso_country": airport_code["iso_country"], "ident": airport_code["ident"], "iata_code": airport_code["iata_code"]})
+                    airport_data.append({"name": airport_code["name"], "municipality": airport_code["municipality"],
+                                         "iso_country": airport_code["iso_country"], "ident": airport_code["ident"],
+                                         "iata_code": airport_code["iata_code"]})
     return render_template('dashboard/tables/iata_code.html', airport_data=airport_data)
 
 #### Processes ####
