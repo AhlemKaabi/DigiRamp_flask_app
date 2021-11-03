@@ -13,7 +13,7 @@
 
 <img src="images/landingpage.png">
 
-DigiRamp is a web application written in flask micro-framework. It is a solution for airline companies. That offers leaner communication across multiple departments while preparing the aircraft for the next flight.
+DigiRamp is a web application written in flask micro-framework. It is a solution for airline companies that offers leaner communication across multiple departments while preparing the aircraft for the next flight.
 
 To use a demo of the app click [here](http://46.101.79.78/)
 ### Disclaimer :exclamation:
@@ -57,7 +57,7 @@ This guide will help you to start using the web application in your local enviro
 that will not be pushed to version control
 due to their sensitive nature.
 In this case, we put the secret key
-as well as the database URI which contains the database
+as well as the database URI which contains the database.
 ```
 # instance/config.py
 
