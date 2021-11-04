@@ -1,13 +1,15 @@
+"""
+    Importing the needed modules to build the forms classes that will
+    handle diffrent forms.
+"""
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 
-# from ..models import Flight
-# start a flight form!
 class FlightForm(FlaskForm):
     """
-    Form for ramp agent to add a flight
+    Form for ramp agent to add a flight.
     """
     flight_number = StringField(validators=[DataRequired()])
     departure = StringField(validators=[DataRequired()])
@@ -17,7 +19,7 @@ class FlightForm(FlaskForm):
 
 class UploadLoadsheet(FlaskForm):
     """
-    add a loadshet Picture
+    Upload a loadshet picture form.
     """
     flight_number = StringField('Flight number',validators=[DataRequired()])
     picture = FileField('Upload Loadsheet', validators=[FileAllowed(['jpg', 'png'])])
@@ -26,8 +28,7 @@ class UploadLoadsheet(FlaskForm):
 
 class DisplayLoadsheet(FlaskForm):
     """
-    display flight loadsheet
+    Display a loadshet picture form.
     """
     flight_number = StringField('Flight number',validators=[DataRequired()])
     submit = SubmitField('Display loadsheet')
-
