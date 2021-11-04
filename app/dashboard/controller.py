@@ -1,29 +1,42 @@
+"""
+    Importing the needed modules to build the controllers function that will
+    handle all the dashborad function/features.
+"""
 from flask import flash, redirect, render_template, url_for, jsonify
 from flask.globals import request
 from flask_login import login_required, current_user
-import datetime
+# Import the blueprint.
 from . import dashboard
+# Import the needed class forms.
 from .forms import FlightForm, UploadLoadsheet, DisplayLoadsheet
+# Import the database variable.
 from .. import db
+# Import the Flight and the Process models.
 from ..models import Flight, Process
+# Import more useful moduels.
 import os
 import secrets
+import datetime
 
-processes = ["Deplanement", "Unloading", "Refuling", "Catering", "Cleaning", "Bording", "Loading", "Pushback"]
 
-# list the ramp agent operated flights!
+
 @dashboard.route('/flights', methods=['GET', 'POST'])
 @login_required
 def list_flights():
     """
-    List all flights
+    Handle requests to the /flights route
+    List all the operated flights for the current loged in Ramp agent(employee).
     """
     flights = Flight.query.filter_by(rampagent_id = current_user.id)
-
+    # Load all flights table template page.
     return render_template('dashboard/flights/flights.html', flights=flights)
 
 
 def transform_date(date):
+    """
+    Transform the date string to another style that is specific
+    to the aeronautic field.
+    """
     transformed_date = ""
     months = {
         "01": "JAN",
@@ -51,18 +64,21 @@ def transform_date(date):
         if Mon_C == month:
             month = Mon_L
     transformed_date = ''.join([day, month, year])
+    # ddMONyy, exp 04NOV21 == 04/11/2021
     return transformed_date
 
-# dashboard to start the ramp operations!
+
 @dashboard.route('/flights/<int:id>', methods=['GET', 'POST'])
 @login_required
 def start_operation(id):
     """
-    render the ramp agent dashboard template
-    start operations
+    Handle requests to the /flights/<int:id> route
+    Render the ramp agent dashboard template to start operating
+    the flight with id=id.
     """
 
     flight = Flight.query.get_or_404(id)
+    # Create a dictionay that contains the needed informations about a flight to display.
     flight_data ={}
     flight_data["flight_number"] = flight.flight_number
     flight_data["departure"] = flight.departure
@@ -70,21 +86,24 @@ def start_operation(id):
     flight_data["aircraft_registration"] = flight.aircraft_registration
     flight_data["id"] = flight.id
     flight_data["date"] = flight.date
-    processes = Process.query.filter_by(flight_id=id).all()
-
+    # load the operate flight dashbord template.
     return render_template('dashboard/rampdashboard.html', title="Dashboard", flight_data=flight_data)
 
-# add a new flight
+
 @dashboard.route('/flights/add', methods=['GET', 'POST'])
 @login_required
 def add_flight():
     """
-    Add a flight to the database
+    Handle requests to the //flights/add route
+    Form to add a flight to the database
     """
-    #check current user
+    # Add_flight boolean variable: to distinguish which title to put for
+    # the flight form (add er edit).
     add_flight = True
+    # Create a form object from the login form.
     form = FlightForm()
     if form.validate_on_submit():
+        # On submit button save the date!
         today = str(datetime.date.today())
         flight = Flight(flight_number=form.flight_number.data.upper(),
                         departure=form.departure.data.upper(),
@@ -101,24 +120,25 @@ def add_flight():
         except:
             # in case flight number already exists
             flash('Error: flight number already exists.')
+            # redirect to dashborad of the list all operated flights page.
             return redirect(url_for('dashboard.list_flights'))
-        # redirect to departments page
 
-    # load department template
+    # load add flight form template.
     return render_template('dashboard/flights/flight.html', form=form, title="Add flight", add_flight=add_flight)
 
 
 
-# edit a flight
 @dashboard.route('/flights/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_flight(id):
     """
-    Edit a flight
+    Handle requests to the /flights/edit/<int:id> route
+    Form to edit a flight.
     """
-
+    # Add_flight boolean variable: to distinguish which title to put for
+    # The flight form template(add er edit).
     add_flight = False
-
+    # edit flight with id!
     flight = Flight.query.get_or_404(id)
     form = FlightForm(obj=flight)
     if form.validate_on_submit():
@@ -126,19 +146,18 @@ def edit_flight(id):
         flight.departure = form.departure.data.upper()
         flight.destination = form.destination.data.upper()
         flight.aircraft_registration = form.aircraft_registration.data.upper()
-
-
+        # Commit to the database.
         db.session.commit()
         flash('You have successfully edited the Flight.')
 
-        # redirect to the flights page
+        # Redirect to the flights page
         return redirect(url_for('dashboard.list_flights'))
 
     form.aircraft_registration.data = flight.aircraft_registration
     form.destination.data = flight.destination
     form.departure.data = flight.departure
     form.flight_number.data = flight.flight_number
-
+    # Load edit flight form template.
     return render_template('dashboard/flights/flight.html', add_flight=add_flight, form=form,
                            flight=flight, title="Edit Flight")
 
@@ -146,15 +165,25 @@ def edit_flight(id):
 @login_required
 def show_manual_loadsheet():
     """
-    show manual loadsheet
+    Handle requests to the /flights/Manual-Loadsheet route
+    show manual loadsheet picture
     """
+    # render template
     return render_template('dashboard/loadsheet/manual.html')
 
 def save_picture(form_picture):
+    """
+    Function to save an uploaded picture, using a filesystem
+    Return: the saved picture new name
+    """
+    # Generate a random name for the uploaded picture.
     random_hex = secrets.token_hex(4)
     _, f_ext = os.path.splitext(form_picture.filename)
+    # Rename the uploaded picture.
     picture_fn = random_hex + f_ext
+    # Save the uploaded picture into the file uploads.
     picture_path = os.path.join('/home/ahlemkaabi/Desktop/PFA/Perform_better_flask_app/app/static/uploads', picture_fn)
+    # test
     print(picture_path)
     form_picture.save(picture_path)
     return picture_fn
@@ -164,25 +193,23 @@ def save_picture(form_picture):
 @login_required
 def upload_EDP_loadsheet():
     """
-    upload EDP Loadsheet
+    Handle requests to the /flights/Manual-Loadsheet route
+    Upload EDP Loadsheet picture.
     """
     form = UploadLoadsheet()
     if form.validate_on_submit():
         flight = Flight.query.filter_by(flight_number=form.flight_number.data.upper()).first()
         if flight:
             if form.picture.data:
-                print("validate on submit")
                 picture_file = save_picture(form.picture.data)
-                print(picture_file)
-                print("save flight loadsheet")
                 flight.flight_loadsheet = picture_file
-                print(flight.flight_loadsheet)
                 db.session.commit()
                 flash('Loadsheet have been added!')
         else:
             flash('There is not Flight Number'.format(form.flight_number.data.upper()))
-
+        # Redirect  the user to the same form to upload new picture - default
         return redirect(url_for('dashboard.upload_EDP_loadsheet'))
+    # Load the upload form template page.
     return render_template('dashboard/loadsheet/uploadEDP.html', form=form)
 
 
@@ -191,7 +218,8 @@ def upload_EDP_loadsheet():
 @login_required
 def display_EDP_loadsheet():
     """
-    display EDP Loadsheet
+    Handle requests to the /flights/display-EDP-loadsheet route
+    Display EDP Loadsheet picture.
     """
     flight_loadsheet = ""
     form = DisplayLoadsheet()
@@ -200,22 +228,23 @@ def display_EDP_loadsheet():
         if flight:
                 flight_loadsheet = flight.flight_loadsheet
                 flash('Loadsheet have been displayed!')
-                print(flight_loadsheet)
         else:
             flash('There is no Flight Number'.format(form.flight_number.data.upper()))
+    # Load the display form template page.
     return render_template('dashboard/loadsheet/displayEDP.html', form=form, flight_loadsheet=flight_loadsheet)
 
 
 
-
-# inside the tables section 1- list all flights operations data!
+# Inside the tables section (1-) list all flights operations data
 # with its specific search feature!
 @dashboard.route('/list-operated_flights', methods=['GET', 'POST'])
 @login_required
 def operated_flights():
     """
-    list all operated flights tables!
+    Handle requests to the /list-operated_flights route
+    List all operated flights with processes tables.
     """
+    # Search feature back end
     q = request.args.get('q')
     if q:
         flights = Flight.query.filter(Flight.flight_number.contains(q))
@@ -223,78 +252,97 @@ def operated_flights():
     else:
         flights = Flight.query.all()
         processes = Process.query.all()
+    # Load the tables of operated flight template page according to the variables flights and processes.
     return render_template('dashboard/tables/operated_flights.html', flights=flights, processes=processes)
 
-# inside the tables section 2- list all countries(departure or arrival) data! form the API based on the iata_code
-# with its specific search feature!
-from app import cache
 
+# Inside the tables section (2-) list all countries called
+# form the API based on the iata_code.
+# Use Cache to decrease the loding time for each API call.
+from app import cache
 @dashboard.route('/list-airports-IATA-code', methods=['GET', 'POST'])
 @cache.cached(timeout=100000)
 @login_required
 def iata_code():
     """
-    list all flight tables!
+    Handle requests to the /list-airports-IATA-code route
+    API call for the Package that contains the IATA codes.
     """
     from datapackage import Package
     package = Package('https://datahub.io/core/airport-codes/datapackage.json')
-    # print list of all resources:
-    print(package.resource_names)
     airport_data = []
-    # print processed tabular data (if exists any)
     for resource in package.resources:
+        # Import the data with csv form.
         if resource.descriptor['datahub']['type'] == 'derived/csv':
-            print(type(resource))
-            print(resource.schema.descriptor)
             for airport_code in resource.read(keyed=True):
                 if airport_code["iata_code"] != None:
-                    airport_data.append({"name": airport_code["name"], "municipality": airport_code["municipality"], "iso_country": airport_code["iso_country"], "ident": airport_code["ident"], "iata_code": airport_code["iata_code"]})
+                    airport_data.append({"name": airport_code["name"], "municipality": airport_code["municipality"],
+                                         "iso_country": airport_code["iso_country"], "ident": airport_code["ident"],
+                                         "iata_code": airport_code["iata_code"]})
     return render_template('dashboard/tables/iata_code.html', airport_data=airport_data)
 
 #### Processes ####
 
+
+# In this part, we will handle the buttons for each process.
+# The same logic will be for all functions
+# I will comment only the first function ! "deplanment()"
+
+
+##----------------------------------------------------------------------------##
+#  Initialize the deplanment data to save the new information each time.
 deplanement_data = []
 @dashboard.route('/deplanement/<int:id>', methods=['POST'])
 @login_required
 def deplanement(id):
+    # Get the flight object with the specific id
     flight = Flight.query.get_or_404(id)
+    # Initialize the variables to save into the db.
     Status=""
     StartTime=""
     EndTime=""
+    # data get from the request
     dataGet = '' if not request.get_json(force=True) else request.get_json(force=True)
     print(dataGet)
+    # replay data will not we used -- only for future freatures
     dataReply = {'backend_data':'hi there from python flask'}
     deplanement_data.append(dataGet)
+    # The filght can not have multiple deplanments (process)
     OneDeplanementPerFlight = Process.query.filter_by(flight_id=id, process_name="Deplanement").first()
-    if OneDeplanementPerFlight == None: # There Still No flight with that flight_id
+    # Flight exit or not.
+    if OneDeplanementPerFlight == None:
+    # There Still No flight with that flight_id
+        # Add the deplanement process row to the databases.
         deplanement = Process(process_name="Deplanement",
                             flight_id= flight.id,
                             rampagent_id = current_user.id)
         db.session.add(deplanement)
         db.session.commit()
+        # to start operate this process logically we shoud have a status!
+        # Add that status to the database!
         for item in deplanement_data:
             if next(iter(item)) == "status":
-                print("this is the status: ")
-                print(next(iter(item.items()))[1])
                 Status = next(iter(item.items()))[1]
                 if Status:
                     StatusUpdate = Process.query.get(deplanement.id)
                     StatusUpdate.status = Status
                     db.session.commit()
     else:
+    # There is already a row for that flight with that process started.
+        # Add the rest of the data into the same row of the db, deplanment
         deplanement = Process.query.filter_by(flight_id=id, process_name="Deplanement").first()
         print(deplanement_data)
         for item in deplanement_data:
+            # Save the start time
             if next(iter(item)) == "StartTime":
-                print("this is the StartTime: ")
-                print(next(iter(item.items()))[1])
                 StartTime = next(iter(item.items()))[1]
                 if StartTime:
                     StartTimeUpdate = Process.query.get(deplanement.id)
+                    # Make sure to save time only one time
                     if StartTimeUpdate.start_time == None:
                         StartTimeUpdate.start_time = StartTime
                         db.session.commit()
-
+            # Same the end time
             if next(iter(item)) == "EndTime":
                 print("this is the EndTime: ")
                 print(next(iter(item.items()))[1])
@@ -306,6 +354,13 @@ def deplanement(id):
                         db.session.commit()
 
     return jsonify(dataReply)
+
+
+
+
+# In this part, we will handle the buttons for each process.
+# The same logic will be for all functions
+# I will comment only the first function ! "deplanment()"
 
 
 unloading_data = []
@@ -364,6 +419,10 @@ def unloading(id):
     return jsonify(dataReply)
 
 
+# In this part, we will handle the buttons for each process.
+# The same logic will be for all functions
+# I will comment only the first function ! "deplanment()"
+
 
 refuling_data = []
 @dashboard.route('/refuling/<int:id>', methods=['POST'])
@@ -418,6 +477,11 @@ def refuling(id):
                         db.session.commit()
 
     return jsonify(dataReply)
+
+
+# In this part, we will handle the buttons for each process.
+# The same logic will be for all functions
+# I will comment only the first function ! "deplanment()"
 
 
 catering_data = []
@@ -475,6 +539,11 @@ def catering(id):
     return jsonify(dataReply)
 
 
+# In this part, we will handle the buttons for each process.
+# The same logic will be for all functions
+# I will comment only the first function ! "deplanment()"
+
+
 cleaning_data = []
 @dashboard.route('/cleaning/<int:id>', methods=['POST'])
 @login_required
@@ -528,6 +597,11 @@ def cleaning(id):
                         db.session.commit()
 
     return jsonify(dataReply)
+
+# In this part, we will handle the buttons for each process.
+# The same logic will be for all functions
+# I will comment only the first function ! "deplanment()"
+
 
 bording_data = []
 @dashboard.route('/bording/<int:id>', methods=['POST'])
@@ -584,6 +658,11 @@ def bording(id):
     return jsonify(dataReply)
 
 
+# In this part, we will handle the buttons for each process.
+# The same logic will be for all functions
+# I will comment only the first function ! "deplanment()"
+
+
 loading_data = []
 @dashboard.route('/loading/<int:id>', methods=['POST'])
 @login_required
@@ -637,6 +716,11 @@ def loading(id):
                         db.session.commit()
 
     return jsonify(dataReply)
+
+
+# In this part, we will handle the buttons for each process.
+# The same logic will be for all functions
+# I will comment only the first function ! "deplanment()"
 
 
 pushback_data = []

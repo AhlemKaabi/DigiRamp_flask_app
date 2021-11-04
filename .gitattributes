@@ -1,0 +1,3 @@
+
+*.css linguist-language=python
+*.scss linguist-language=python
