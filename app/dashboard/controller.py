@@ -1,6 +1,6 @@
 """
     Importing the needed modules to build the controllers function that will
-    handle the authentication blueprint.
+    handle all the dashborad function/features.
 """
 from flask import flash, redirect, render_template, url_for, jsonify
 from flask.globals import request
