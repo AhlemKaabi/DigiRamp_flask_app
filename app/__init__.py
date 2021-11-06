@@ -15,7 +15,8 @@ from flask_caching import Cache
 
 # local imports
 from config import app_config
-
+from config import Config
+configuration = Config()
 #----------------------------------------------------------------------------#
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
 
@@ -27,7 +28,7 @@ login_agent = LoginManager()
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(app_config[config_name])
+    app.config.from_object(configuration)
     app.config.from_pyfile('config.py')
     cache.init_app(app)
 
