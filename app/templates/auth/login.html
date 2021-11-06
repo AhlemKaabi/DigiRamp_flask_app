@@ -49,10 +49,10 @@
                                     <form class="user" method="POST">
                                         {{ form.hidden_tag() }}
                                         <div class="form-group">
-                                            {{ form.email(class="form-control form-control-user", placeholder="Enter Email Address...")}}
+                                            {{ form.user_code(class="form-control form-control-user", placeholder="Enter Your User Code")}}
                                         </div>
                                         <div class="form-group">
-                                            {{ form.password(class="form-control form-control-user", placeholder="Password")}}
+                                            {{ form.password(class="form-control form-control-user", placeholder="Enter Your Password")}}
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">
@@ -65,9 +65,9 @@
                                         </div>
                                         <hr>
                                     </form>
-                                    <div class="text-center">
-                                        <a class="small" href="{{ url_for('auth.register') }}">Create an Account!</a>
-                                    </div>
+                                    <!-- <div class="text-center">
+                                        <a class="small" href="{{ url_for('auth.login') }}">Create an Account!</a>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>

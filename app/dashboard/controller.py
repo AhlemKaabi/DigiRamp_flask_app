@@ -2,7 +2,7 @@
     Importing the needed modules to build the controllers function that will
     handle all the dashborad function/features.
 """
-from flask import flash, redirect, render_template, url_for, jsonify
+from flask import flash, redirect, render_template, url_for, jsonify, abort
 from flask.globals import request
 from flask_login import login_required, current_user
 # Import the blueprint.
@@ -12,12 +12,22 @@ from .forms import FlightForm, UploadLoadsheet, DisplayLoadsheet
 # Import the database variable.
 from .. import db
 # Import the Flight and the Process models.
-from ..models import Flight, Process
+from ..models import Flight, Process, RampAgent
 # Import more useful moduels.
 import os
 import secrets
 import datetime
 
+
+@dashboard.route('/', methods=['GET', 'POST'])
+@login_required
+def Ramp_Agent_dashboard():
+    """
+    prevent non-RampAgent from accessing the page
+    """
+    if current_user.is_admin:
+        abort(403)
+    return render_template('dashboard/home_ramp_ahent_dashboard.html')
 
 
 @dashboard.route('/flights', methods=['GET', 'POST'])
@@ -244,6 +254,8 @@ def operated_flights():
     Handle requests to the /list-operated_flights route
     List all operated flights with processes tables.
     """
+    # ramp agent class
+    rampagent = RampAgent()
     # Search feature back end
     q = request.args.get('q')
     if q:
@@ -253,7 +265,7 @@ def operated_flights():
         flights = Flight.query.all()
         processes = Process.query.all()
     # Load the tables of operated flight template page according to the variables flights and processes.
-    return render_template('dashboard/tables/operated_flights.html', flights=flights, processes=processes)
+    return render_template('dashboard/tables/operated_flights.html', flights=flights, processes=processes, rampagent=rampagent)
 
 
 # Inside the tables section (2-) list all countries called
