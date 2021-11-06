@@ -1,0 +1,6 @@
+$ flask shell
+>>> from app.models import Rampagent
+>>> from app import db
+>>> admin = Employee(fist_name="admin", last_name="kaabi", email="admin@admin.com",user_code="TU0000",password="pass",is_admin=True)
+>>> db.session.add(admin)
+>>> db.session.commit()
