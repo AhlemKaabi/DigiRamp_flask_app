@@ -59,6 +59,9 @@ def create_app(config_name):
     from .landing_page import landing as landing_blueprint
     app.register_blueprint(landing_blueprint)
 
+    from .admin import admin as admin_blueprint
+    app.register_blueprint(admin_blueprint, url_prefix='/admin')
+
     @app.errorhandler(403)
     def forbidden(error):
         return render_template('errors/403.html', title='Forbidden'), 403

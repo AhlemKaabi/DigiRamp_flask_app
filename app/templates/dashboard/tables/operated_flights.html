@@ -39,7 +39,7 @@
 <form method="GET"
 class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
 <div class="input-group">
-	<input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+	<input type="text" class="form-control bg-light border-0 small" placeholder="Search only for Flight Numbers..."
 		aria-label="Search" aria-describedby="basic-addon2" name="q">
 	<div class="input-group-append">
 		<button id="SearchButton" class="btn btn-primary" type="submit">
@@ -65,56 +65,110 @@ class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 
 							{% endif %}
 						{% endwith %}
 					</div>
-						<h4 style="text-align:center;">All Flights for {{ current_user.first_name}} {{ current_user.last_name}}</h4>
-					{% if flights or processes %}
-						<hr class="intro-divider">
-						<div class="center">
-						{% for flight in flights%}
-							{% if flight.rampagent_id == current_user.id %}
-								<div class="col-xl-12 col-lg-7">
-									<div class="card shadow mb-4">
-										<div class="card-header py-3">
-											<a href="{{ url_for('dashboard.start_operation', id=flight.id) }}"><h6 class="m-0 font-weight-bold text-primary">Flight Number: {{ flight.flight_number }}</h6></a>
-										</div>
-										<div class="card-body">
-											<div class="table-responsive">
-												<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-													<thead>
-														<tr>
-															<th>Process Name</th>
-															<th>Status</th>
-															<th>Start</th>
-															<th>End</th>
-														</tr>
-													</thead>
-													<tbody>
-														{% for process in processes%}
-															{% if process.flight_id == flight.id and process.rampagent_id == current_user.id%}
+					{% if current_user.is_authenticated %}
+						{% if current_user.is_admin %}
+							<h4 style="text-align:center;">All Operated Flights</h4>
+							{% if flights or processes %}
+							<hr class="intro-divider">
+							<div class="center">
+								{% for flight in flights%}
+									<div class="col-xl-12 col-lg-7">
+										<div class="card shadow mb-4">
+											<div class="card-header py-3">
+												<h6 class="m-0 font-weight-bold text-primary">Flight Number: {{ flight.flight_number }} Ramp Agent: {{ rampagent.query.get(flight.rampagent_id).first_name }} {{ rampagent.query.get(flight.rampagent_id).last_name }} Code: {{ rampagent.query.get(flight.rampagent_id).user_code }} </h6>
+											</div>
+											<div class="card-body">
+												<div class="table-responsive">
+													<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+														<thead>
 															<tr>
-																<td>{{ process.process_name}}</td>
-																<td>{{ process.status}}</td>
-																<td>{{ process.start_time}}</td>
-																<td>{{ process.end_time}}</td>
+																<th>Process Name</th>
+																<th>Status</th>
+																<th>Start</th>
+																<th>End</th>
 															</tr>
-															{% endif%}
-														{% endfor %}
-													</tbody>
-												</table>
+														</thead>
+														<tbody>
+															{% for process in processes%}
+																{% if process.flight_id == flight.id and process.rampagent_id == current_user.id%}
+																<tr>
+																	<td>{{ process.process_name}}</td>
+																	<td>{{ process.status}}</td>
+																	<td>{{ process.start_time}}</td>
+																	<td>{{ process.end_time}}</td>
+																</tr>
+																{% endif%}
+															{% endfor %}
+														</tbody>
+													</table>
+												</div>
 											</div>
 										</div>
 									</div>
+								{% endfor%}
+							</div>
+							{% else %}
+							<div style="text-align: center">
+								<div style="text-align: center">
+									<h3> No Flight have been Operated.</h3>
+									<hr class="intro-divider">
 								</div>
+							</div>
 							{% endif %}
-						{% endfor%}
+						{% else %}
+						<h4 style="text-align:center;">All Flights for {{ current_user.first_name}} {{ current_user.last_name}}</h4>
+						{% if flights or processes %}
+						<hr class="intro-divider">
+						<div class="center">
+							{% for flight in flights%}
+								{% if flight.rampagent_id == current_user.id %}
+									<div class="col-xl-12 col-lg-7">
+										<div class="card shadow mb-4">
+											<div class="card-header py-3">
+												<a href="{{ url_for('dashboard.start_operation', id=flight.id) }}"><h6 class="m-0 font-weight-bold text-primary">Flight Number: {{ flight.flight_number }}</h6></a>
+											</div>
+											<div class="card-body">
+												<div class="table-responsive">
+													<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+														<thead>
+															<tr>
+																<th>Process Name</th>
+																<th>Status</th>
+																<th>Start</th>
+																<th>End</th>
+															</tr>
+														</thead>
+														<tbody>
+															{% for process in processes%}
+																{% if process.flight_id == flight.id and process.rampagent_id == current_user.id%}
+																<tr>
+																	<td>{{ process.process_name}}</td>
+																	<td>{{ process.status}}</td>
+																	<td>{{ process.start_time}}</td>
+																	<td>{{ process.end_time}}</td>
+																</tr>
+																{% endif%}
+															{% endfor %}
+														</tbody>
+													</table>
+												</div>
+											</div>
+										</div>
+									</div>
+								{% endif %}
+							{% endfor%}
 						</div>
-					{% else %}
-					<div style="text-align: center">
+						{% else %}
 						<div style="text-align: center">
-							<h3> No Flight have been Operated.</h3>
-							<hr class="intro-divider">
+							<div style="text-align: center">
+								<h3> No Flight have been Operated.</h3>
+								<hr class="intro-divider">
+							</div>
 						</div>
-					</div>
+						{% endif %}
+						{% endif %}
 					{% endif %}
+
 				</div>
 			</div>
 		</div>

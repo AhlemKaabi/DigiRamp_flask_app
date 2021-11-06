@@ -10,8 +10,6 @@ class RampAgent(UserMixin, db.Model):
     Create an RampAgent table
     """
 
-    # Ensures table will be named in plural and not in singular
-    # as is the name of the model
     __tablename__ = 'rampagents'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -19,6 +17,8 @@ class RampAgent(UserMixin, db.Model):
     first_name = db.Column(db.String(60), index=True)
     last_name = db.Column(db.String(60), index=True)
     password_hash = db.Column(db.String(128))
+    user_code = db.Column(db.String(60), index=True, unique=True)
+    is_admin = db.Column(db.Boolean, default=False)
 
     @property
     def password(self):

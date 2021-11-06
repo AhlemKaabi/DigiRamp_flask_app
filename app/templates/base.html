@@ -22,22 +22,43 @@
 			<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
 				<!-- Sidebar - Brand -->
-				<a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('dashboard.list_flights') }}">
-					<div class="sidebar-brand-icon rotate-n-15">
-						<!-- <i class="fas fa-laugh-wink"></i> -->
-					</div>
-					<div class="sidebar-brand-text mx-3">Digi-Ramp</div>
-				</a>
+				{% if current_user.is_authenticated %}
+					{% if current_user.is_admin %}
+					<a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('admin.admin_dashboard') }}">
+						<div class="sidebar-brand-icon rotate-n-15">
+							<!-- <i class="fas fa-laugh-wink"></i> -->
+						</div>
+						<div class="sidebar-brand-text mx-3">Digi-Ramp</div>
+					</a>
+					{% else %}
+					<a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url_for('dashboard.Ramp_Agent_dashboard') }}">
+						<div class="sidebar-brand-icon rotate-n-15">
+							<!-- <i class="fas fa-laugh-wink"></i> -->
+						</div>
+						<div class="sidebar-brand-text mx-3">Digi-Ramp</div>
+					</a>
+					{% endif %}
+				{% endif %}
 
 				<!-- Divider -->
 				<hr class="sidebar-divider my-0">
 
 				<!-- Nav Item - Dashboard -->
-				<li class="nav-item active">
-					<a class="nav-link" href="{{ url_for('dashboard.add_flight') }}">
-					<i class="fa fa-plus"></i>
-					<span>Add New Flight</span></a>
-				</li>
+				{% if current_user.is_authenticated %}
+					{% if current_user.is_admin %}
+					<li class="nav-item active">
+						<a class="nav-link" href="{{ url_for('admin.register_rampagent') }}">
+						<i class="fa fa-plus"></i>
+						<span>Ramp agents</span></a>
+					</li>
+					{% else %}
+					<li class="nav-item active">
+						<a class="nav-link" href="{{ url_for('dashboard.add_flight') }}">
+						<i class="fa fa-plus"></i>
+						<span>Add New Flight</span></a>
+					</li>
+					{% endif %}
+				{% endif %}
 
 				<!-- Divider -->
 				<hr class="sidebar-divider">
@@ -46,6 +67,23 @@
 				<div class="sidebar-heading">
 					Interface
 				</div>
+				{% if current_user.is_admin %}
+				<li class="nav-item">
+					<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseloadsheet"
+						aria-expanded="true" aria-controls="collapseloadsheet">
+						<i class="fas fa-fw fa-cog"></i>
+						<span>Ramp Agents</span>
+					</a>
+					<div id="collapseloadsheet" class="collapse" aria-labelledby="headingloadsheet" data-parent="#accordionSidebar">
+						<div class="bg-white py-2 collapse-inner rounded">
+							<h6 class="collapse-header">types of load sheet:</h6>
+							<a class="collapse-item" href="{{ url_for('admin.list_all_ramp_agents') }}">List All Ramp agents</a>
+							<a class="collapse-item" href="{{ url_for('admin.operated_flights') }}">Ramp agents' Flights<br>Operated</a>
+						</div>
+					</div>
+				</li>
+
+				{% else %}
 
 				<!-- Load Sheet Instructions - Collapse Menu -->
 				<li class="nav-item">
@@ -137,7 +175,7 @@
 						</div>
 					</div>
 				</li>
-
+				{% endif %}
 				<!-- Divider -->
 				<hr class="sidebar-divider">
 
@@ -304,23 +342,25 @@
 								<!-- Dropdown - User Information -->
 								<div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
 									aria-labelledby="userDropdown">
-									<!-- <a class="dropdown-item" href="#">
-										<i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-										Profile
-									</a>
-									<a class="dropdown-item" href="#">
-										<i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-										Settings
-									</a> -->
-									<a class="dropdown-item" href="{{ url_for('dashboard.list_flights') }}">
-										<i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-										List My Flights
-									</a>
-									<div class="dropdown-divider"></div>
-									<a class="dropdown-item" href="{{ url_for('auth.login') }}" data-toggle="modal" data-target="#logoutModal">
-										<i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-										Logout
-									</a>
+									{% if current_user.is_authenticated %}
+										{% if current_user.is_admin %}
+										<a class="dropdown-item" href="{{ url_for('auth.login') }}" data-toggle="modal" data-target="#logoutModal">
+											<i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+											Logout
+										</a>
+										{% else %}
+										<a class="dropdown-item" href="{{ url_for('dashboard.list_flights') }}">
+											<i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+											List My Flights
+										</a>
+										<div class="dropdown-divider"></div>
+										<a class="dropdown-item" href="{{ url_for('auth.login') }}" data-toggle="modal" data-target="#logoutModal">
+											<i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+											Logout
+										</a>
+										{% endif %}
+									{% endif %}
+
 								</div>
 							</li>
 
