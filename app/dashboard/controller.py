@@ -192,7 +192,7 @@ def save_picture(form_picture):
     # Rename the uploaded picture.
     picture_fn = random_hex + f_ext
     # Save the uploaded picture into the file uploads.
-    picture_path = os.path.join('/home/ahlemkaabi/Desktop/PFA/Perform_better_flask_app/app/static/uploads', picture_fn)
+    picture_path = os.path.join('/home/ahlem/DigiRamp_flask_app/app/static/uploads', picture_fn)
     # test
     print(picture_path)
     form_picture.save(picture_path)
